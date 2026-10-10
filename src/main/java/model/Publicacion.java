@@ -2,13 +2,14 @@ package main.java.model;
 
 import java.time.LocalDateTime;
 
-public class Publicacion {
+public class Publicacion{
 
     private final int id;
     private final String autor;
     private final LocalDateTime fechaHora;
     private final int reacciones;
     private final int comentarios;
+    private final int relevancia;
 
     public Publicacion(int id, String autor, LocalDateTime fechaHora, int reacciones, int comentarios) {
         this.id = id;
@@ -16,6 +17,7 @@ public class Publicacion {
         this.fechaHora = fechaHora;
         this.reacciones = reacciones;
         this.comentarios = comentarios;
+        this.relevancia = relevancia();
     }
 
     public int getId() {return id;}
@@ -23,11 +25,16 @@ public class Publicacion {
     public LocalDateTime getFechaHora() {return fechaHora;}
     public int getReacciones() {return reacciones;}
     public int getComentarios() {return comentarios;}
+    public int getRelevancia(){return relevancia;}
 
     @Override
     public String toString() {
         return "id: " + id + ", autor: " + autor + ", " +
                 fechaHora + ", " + "cantidad de reacciones: "
                 + reacciones + "cantidad de comentarios: " + comentarios;
+    }
+
+    private int relevancia(){
+        return this.reacciones + (this.comentarios*3);
     }
 }
