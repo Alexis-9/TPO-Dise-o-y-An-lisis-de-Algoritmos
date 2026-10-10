@@ -49,6 +49,23 @@ public class ResultadoDijkstra {
         return camino;
     }
 
+    public String describirCadena(Usuario destino) {
+        if (destino == null) { throw new IllegalArgumentException("Usuario no puede ser nulo"); }
+
+        if (!esAlcanzable(destino)) {
+            return "No existe una cadena de difusión de " + origen + " a " + destino;
+        }
+
+        StringBuilder sb = new StringBuilder("Cadena: ");
+        ArrayList<Usuario> camino = getCamino(destino);
+        for (int i = 0; i < camino.size(); i++) {
+            if (i > 0) { sb.append(" -> "); }
+            sb.append(camino.get(i));
+        }
+        sb.append(" | Tiempo total: ").append(getDistancia(destino)).append(" min");
+        return sb.toString();
+    }
+
     public ArrayList<String> getTraza(){
         return traza;
     }
