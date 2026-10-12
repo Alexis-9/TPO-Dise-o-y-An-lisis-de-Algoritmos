@@ -1,6 +1,8 @@
 package main.java.model;
 
-public class Iniciativa {
+import main.java.model.interfaces.Valuable;
+
+public class Iniciativa implements Valuable {
 
     private final int id;
     private final int costo;
@@ -24,5 +26,15 @@ public class Iniciativa {
     @Override
     public String toString() {
         return "Iniciativa #" + id + " (costo=" + costo + ", impacto=" + impacto + ")";
+    }
+
+    @Override
+    public int getPeso() {
+        return getCosto();
+    }
+
+    @Override
+    public int getValor() {
+        return getImpacto();
     }
 }
