@@ -1,6 +1,8 @@
 package main.java.model;
 
-public class Vinculo {
+import main.java.model.interfaces.Arista;
+
+public class Vinculo implements Arista<Usuario> {
 
     private final Usuario origen;
     private final Usuario destino;
@@ -15,9 +17,14 @@ public class Vinculo {
         this.minutos = minutos;
     }
 
-    public Usuario getOrigen() {return origen; }
-    public Usuario getDestino() {return destino; }
-    public int getMinutos() {return minutos; }
+    @Override
+    public Usuario getOrigen() {return origen;}
+
+    @Override
+    public Usuario getDestino() {return destino;}
+
+    @Override
+    public int getPeso() {return minutos;}
 
     @Override
     public String toString() {
