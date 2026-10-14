@@ -1,8 +1,11 @@
 package main.java.model;
 
+import main.java.model.interfaces.Arista;
+import main.java.model.interfaces.Grafo;
+
 import java.util.*;
 
-public class RedSocial {
+public class RedSocial implements Grafo<Usuario> {
 
     private final Map<Integer, Usuario> usuarios = new HashMap<>();
     private final Map<Usuario, ArrayList<Vinculo>> adyacencia = new HashMap<>();
@@ -57,4 +60,18 @@ public class RedSocial {
         return Collections.unmodifiableCollection(usuarios.values());
     }
 
+    @Override
+    public Collection<Usuario> getVertices() {
+        return getUsuarios();
+    }
+
+    @Override
+    public List<Vinculo> getAdyacentes(Usuario u) {
+        return getVinculosSalientes(u);
+    }
+
+    @Override
+    public boolean contiene(Usuario u) {
+        return u != null && usuarios.containsKey(u.getId());
+    }
 }

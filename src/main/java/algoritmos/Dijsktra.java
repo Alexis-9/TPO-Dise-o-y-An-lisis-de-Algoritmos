@@ -1,9 +1,8 @@
 package main.java.algoritmos;
 
 import main.java.algoritmos.resultado.ResultadoDijkstra;
-import main.java.model.RedSocial;
-import main.java.model.Usuario;
-import main.java.model.Vinculo;
+import main.java.model.interfaces.Arista;
+import main.java.model.interfaces.Grafo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,27 +15,25 @@ public class Dijsktra {
     private Dijsktra() { }
 
 
-    public static ResultadoDijkstra calcular(RedSocial red, Usuario origen) {
-        if (red == null) { throw new IllegalArgumentException("La red no puede ser nula"); }
+    public static <T extends Comparable<T>> ResultadoDijkstra<T> calcular(Grafo<T> grafo, T origen) {
+        if (grafo == null) { throw new IllegalArgumentException("El grafo no puede ser nulo"); }
         if (origen == null) { throw new IllegalArgumentException("El origen no puede ser nulo"); }
+        if (!grafo.contiene(origen)) { throw new IllegalArgumentException("El origen no pertenece al grafo"); }
 
-        Usuario inicio = red.getUsuario(origen.getId());
-        if (inicio == null) { throw new IllegalArgumentException("El origen no pertenece a la red"); }
-
-        Map<Usuario, Integer> distancias = new HashMap<>();
-        Map<Usuario, Usuario> predecesores = new HashMap<>();
-        Set<Usuario> visitados = new HashSet<>();
+        Map<T, Integer> distancias = new HashMap<>();
+        Map<T, T> predecesores = new HashMap<>();
+        Set<T> visitados = new HashSet<>();
         ArrayList<String> traza = new ArrayList<>();
 
-        distancias.put(inicio, 0);
-        traza.add("Inicio: " + inicio + " con tiempo 0 min");
+        distancias.put(origen, 0);
+        traza.add("Inicio: " + origen + " con tiempo 0 min");
 
-        int n = red.getUsuarios().size();
+        int n = grafo.getVertices().size();
         for (int i = 0; i < n; i++) {
 
-            Usuario actual = seleccionarMasCercano(red, distancias, visitados);
+            T actual = seleccionarMasCercano(grafo, distancias, visitados);
             if (actual == null) {
-                traza.add("No quedan usuarios alcanzables sin visitar: fin del cálculo");
+                traza.add("No quedan vértices alcanzables sin visitar: fin del cálculo");
                 break;
             }
 
@@ -44,11 +41,11 @@ public class Dijsktra {
             int tiempoActual = distancias.get(actual);
             traza.add("Selecciona " + actual + ": tiempo definitivo " + tiempoActual + " min");
 
-            for (Vinculo vinculo : red.getVinculosSalientes(actual)) {
-                Usuario vecino = vinculo.getDestino();
+            for (Arista<T> arista : grafo.getAdyacentes(actual)) {
+                T vecino = arista.getDestino();
                 if (visitados.contains(vecino)) { continue; }
 
-                int tiempoNuevo = tiempoActual + vinculo.getMinutos();
+                int tiempoNuevo = tiempoActual + arista.getPeso();
                 Integer tiempoConocido = distancias.get(vecino);
 
                 if (tiempoConocido == null || tiempoNuevo < tiempoConocido) {
@@ -58,27 +55,27 @@ public class Dijsktra {
                             + (tiempoConocido == null ? "sin camino" : tiempoConocido + " min")
                             + " -> " + tiempoNuevo + " min (vía " + actual + ")");
                 } else {
-                    traza.add("   Descarta " + vinculo + ": " + tiempoNuevo
+                    traza.add("   Descarta " + arista + ": " + tiempoNuevo
                             + " min no mejora " + tiempoConocido + " min");
                 }
             }
         }
 
-        return new ResultadoDijkstra(inicio, distancias, predecesores, traza);
+        return new ResultadoDijkstra<>(origen, distancias, predecesores, traza);
     }
 
-    private static Usuario seleccionarMasCercano(RedSocial red, Map<Usuario, Integer> distancias,
-                                                 Set<Usuario> visitados) {
-        Usuario mejor = null;
+    private static <T extends Comparable<T>> T seleccionarMasCercano(Grafo<T> grafo, Map<T, Integer> distancias,
+                                                                      Set<T> visitados) {
+        T mejor = null;
         int mejorTiempo = 0;
 
-        for (Usuario u : red.getUsuarios()) {
-            if (visitados.contains(u) || !distancias.containsKey(u)) { continue; }
+        for (T elem : grafo.getVertices()) {
+            if (visitados.contains(elem) || !distancias.containsKey(elem)) { continue; }
 
-            int tiempo = distancias.get(u);
+            int tiempo = distancias.get(elem);
             if (mejor == null || tiempo < mejorTiempo
-                    || (tiempo == mejorTiempo && u.getId() < mejor.getId())) {
-                mejor = u;
+                    || (tiempo == mejorTiempo && elem.compareTo(mejor) < 0)) {
+                mejor = elem;
                 mejorTiempo = tiempo;
             }
         }
