@@ -20,7 +20,7 @@ public class Mochila<T extends Valuable> {
 
     }
 
-    public void actualizarValores() {
+    private void actualizarValores() {
 
         seleccionados = algoritmoMochila();
         valorMax = getValorTotal();
@@ -107,6 +107,15 @@ public class Mochila<T extends Valuable> {
     public void agregarObjeto(T nuevoObjeto) {
 
         objetos.add(nuevoObjeto);
+        actualizarValores();
+
+    }
+
+    public void eliminarObjeto(T objeto) throws IllegalArgumentException {
+
+        if (!objetos.contains(objeto)) { throw new IllegalArgumentException("Objeto no encontrado."); }
+
+        objetos.remove(objeto);
         actualizarValores();
 
     }
