@@ -1,6 +1,5 @@
 package main.java.model;
 
-import main.java.model.interfaces.Arista;
 import main.java.model.interfaces.Grafo;
 
 import java.util.*;
@@ -13,9 +12,10 @@ public class RedSocial implements Grafo<Usuario> {
     public void agregarUsuario(Usuario u){
 
         if (u == null){throw new IllegalArgumentException("Usuario no puede ser nulo");}
+        if (usuarios.containsKey(u.getId())){throw new IllegalArgumentException("Usuario ya está en la red.");}
 
-        usuarios.putIfAbsent(u.getId(), u);
-        adyacencia.putIfAbsent(u, new ArrayList<>());
+        usuarios.put(u.getId(), u);
+        adyacencia.put(u, new ArrayList<>());
     }
 
     public void agregarVinculo(int idOrigen, int idDestino, int minutos){
@@ -50,6 +50,17 @@ public class RedSocial implements Grafo<Usuario> {
     public List<Vinculo> getVinculosSalientes(Usuario usuario) {
         if (usuario == null) { throw new IllegalArgumentException("El usuario no puede ser nulo"); }
         return Collections.unmodifiableList(adyacencia.getOrDefault(usuario, new ArrayList<>()));
+    }
+
+    public List<Vinculo> getVinculos() {
+        List<Vinculo> todos = new ArrayList<>();
+        for (List<Vinculo> salientes : adyacencia.values()) {
+            todos.addAll(salientes);
+        }
+        todos.sort(Comparator
+                .comparingInt((Vinculo v) -> v.getOrigen().getId())
+                .thenComparingInt(v -> v.getDestino().getId()));
+        return Collections.unmodifiableList(todos);
     }
 
     public Usuario getUsuario(int idUsuario){
