@@ -3,33 +3,33 @@ import java.util.ArrayList;
 
 public class MergeSort {
 
-    public static <T extends Comparable<T>> void mergeSort(T[] s, int inicio, int fin) {
+    public static <T extends Comparable<T>> void mergeSort(T[] lista, int inicio, int fin) {
         if (inicio < fin) {
             int medio = (fin + inicio) / 2;
-            mergeSort(s, inicio, medio);
-            mergeSort(s, medio + 1, fin);
-            merge(s, inicio, fin);
+            mergeSort(lista, inicio, medio);
+            mergeSort(lista, medio + 1, fin);
+            merge(lista, inicio, fin);
         }
     }
 
-    private static <T extends Comparable<T>> void merge(T[] s, int inicio, int fin) {
-        ArrayList<T> r = new ArrayList<>();
+    private static <T extends Comparable<T>> void merge(T[] lista, int inicio, int fin) {
+        ArrayList<T> ordenados = new ArrayList<>();
         int medio = (inicio + fin) / 2;
-        int i = inicio;
-        int j = medio + 1;
+        int izq = inicio;
+        int der = medio + 1;
 
-        for (int k = 0; k <= fin - inicio; k++) {
-            if ((j > fin || s[i].compareTo(s[j]) <= 0) && i <= medio) {
-                r.add(s[i]);
-                i++;
+        for (int i = 0; i <= fin - inicio; i++) {
+            if ((der > fin || lista[izq].compareTo(lista[der]) <= 0) && izq <= medio) {
+                ordenados.add(lista[izq]);
+                izq++;
             } else {
-                r.add(s[j]);
-                j++;
+                ordenados.add(lista[der]);
+                der++;
             }
         }
 
-        for (int k = 0; k <= fin - inicio; k++) {
-            s[inicio + k] = r.get(k);
+        for (int i = 0; i <= fin - inicio; i++) {
+            lista[inicio + i] = ordenados.get(i);
         }
     }
 }
