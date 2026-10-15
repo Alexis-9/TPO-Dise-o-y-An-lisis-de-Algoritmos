@@ -111,9 +111,9 @@ public class Mochila<T extends Valuable> {
 
     }
 
-    public void eliminarObjeto(T objeto) throws IllegalArgumentException {
+    public void eliminarObjeto(T objeto) {
 
-        if (!objetos.contains(objeto)) { throw new IllegalArgumentException("Objeto no encontrado."); }
+        if (!objetos.contains(objeto)) { return; }
 
         objetos.remove(objeto);
         actualizarValores();

@@ -26,12 +26,24 @@ public class IniciativasController {
 
     }
 
-    public void eliminarIniciativa(Iniciativa iniciativa) throws IllegalArgumentException {
+    public void eliminarIniciativa(int idIniciativa) throws IllegalArgumentException {
 
-        if (!iniciativas.contains(iniciativa)) { throw new IllegalArgumentException("No se encontró la iniciativa de ID: " + iniciativa.getId()); }
+        Iniciativa iniciativa = buscarIniciativa(idIniciativa);
+        if (iniciativa == null) { throw new IllegalArgumentException("No se encontró la iniciativa de ID: " + idIniciativa); }
+
         mochilaIniciativas.eliminarObjeto(iniciativa);
 
     }
+
+    public Iniciativa buscarIniciativa(int idIniciativa) {
+
+        for (Iniciativa i : iniciativas) {
+            if (i.getId() == idIniciativa) { return i; }
+        }
+
+        return null;
+    }
+
 
     public ArrayList<Iniciativa> totalIniciativas() { return iniciativas; }
 
