@@ -1,33 +1,16 @@
 package main.java.algoritmos;
 
+import main.java.algoritmos.resultado.ResultadoMochila;
 import main.java.model.interfaces.Valuable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Mochila<T extends Valuable> {
 
-    private final int capacidadMax;
-    private final ArrayList<T> objetos;
-    private ArrayList<T> seleccionados;
-    private int valorMax;
+    private Mochila() { }
 
-    public Mochila(int capacidadMax, ArrayList<T> objetos) {
-
-        this.capacidadMax = capacidadMax;
-        this.objetos = objetos;
-
-        actualizarValores();
-
-    }
-
-    private void actualizarValores() {
-
-        seleccionados = algoritmoMochila();
-        valorMax = getValorTotal();
-
-    }
-
-    private ArrayList<T> algoritmoMochila() {
+    public static <T extends Valuable> ResultadoMochila<T> resolver(ArrayList<T> objetos, int capacidadMax) {
 
         int[][] matriz = new int[objetos.size()][capacidadMax + 1];
 
@@ -58,13 +41,13 @@ public class Mochila<T extends Valuable> {
             }
         }
 
-        valorMax = matriz[objetos.size() - 1][capacidadMax];
-
-        return algoritmoReconstruccion(matriz);
+        return reconstruir(matriz, objetos, capacidadMax);
 
     }
 
-    private ArrayList<T> algoritmoReconstruccion(int[][] matriz) {
+    private static <T extends Valuable> ResultadoMochila<T> reconstruir(int[][] matriz, ArrayList<T> objetos, int capacidadMax) {
+
+        int valorTotal = matriz[objetos.size() - 1][capacidadMax];
 
         int cantAcumulado = 0;
         ArrayList<T> seleccionados = new ArrayList<>();
@@ -72,7 +55,7 @@ public class Mochila<T extends Valuable> {
         int i = objetos.size() - 1;
         int j = capacidadMax;
 
-        while (cantAcumulado < valorMax) {
+        while (cantAcumulado < valorTotal) {
 
             T objeto = objetos.get(i);
 
@@ -99,53 +82,16 @@ public class Mochila<T extends Valuable> {
             }
 
         }
-
-        return seleccionados;
-
-    }
-
-    public void agregarObjeto(T nuevoObjeto) {
-
-        objetos.add(nuevoObjeto);
-        actualizarValores();
-
-    }
-
-    public void eliminarObjeto(T objeto) {
-
-        if (!objetos.contains(objeto)) { return; }
-
-        objetos.remove(objeto);
-        actualizarValores();
-
-    }
-
-    public ArrayList<T> getSeleccionados() { return seleccionados; }
-
-    public int getValorTotal() { return valorMax; }
-
-    public int getPesoTotal() {
+        Collections.reverse(seleccionados);
 
         int pesoTotal = 0;
-
         for (T objeto : seleccionados) {
             pesoTotal += objeto.getPeso();
         }
 
-        return pesoTotal;
+        int sobrante = capacidadMax - pesoTotal;
+
+        return new ResultadoMochila<>(seleccionados, valorTotal, pesoTotal, sobrante);
 
     }
-
-    public int getSobrante() { return capacidadMax - getPesoTotal(); }
-
-    public void mostrarMochila() {
-
-        System.out.println("-".repeat(20));
-        for (T objeto : seleccionados) {
-            System.out.println(objeto.toString());;
-        }
-        System.out.println("-".repeat(20));
-
-    }
-
 }
