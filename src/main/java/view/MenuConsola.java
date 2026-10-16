@@ -1,3 +1,5 @@
+package view;
+
 import algoritmos.resultado.ResultadoDijkstra;
 import controller.DifusionController;
 import controller.IniciativasController;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class Main {
+public class MenuConsola {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
