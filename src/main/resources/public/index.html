@@ -2,9 +2,199 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Red social universitaria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Red universitaria</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <p>Red social universitaria. La API está en <a href="/api/red">/api/red</a>.</p>
+  <header class="barra">
+    <div class="barra-interior">
+      <div class="marca">
+        <span class="marca-nombre">Red universitaria</span>
+        <span class="marca-sub">Programación III · TPO</span>
+      </div>
+
+      <nav class="pestanas" role="tablist" aria-label="Funcionalidades">
+        <button type="button" class="pestana" role="tab" id="tab-difusion" data-vista="difusion"
+                aria-controls="vista-difusion" aria-selected="true">Difusión</button>
+        <button type="button" class="pestana" role="tab" id="tab-muro" data-vista="muro"
+                aria-controls="vista-muro" aria-selected="false" tabindex="-1">Muro</button>
+        <button type="button" class="pestana" role="tab" id="tab-iniciativas" data-vista="iniciativas"
+                aria-controls="vista-iniciativas" aria-selected="false" tabindex="-1">Iniciativas</button>
+      </nav>
+
+      <div class="globales">
+        <p class="error" id="error-global" role="alert"></p>
+        <button type="button" class="boton-discreto" id="boton-demo">Cargar demo</button>
+        <button type="button" class="boton-discreto" id="boton-vaciar">Vaciar todo</button>
+        <span class="confirmar" id="confirmar-vaciar" hidden>
+          <span class="confirmar-texto">¿Borrar todos los datos?</span>
+          <button type="button" class="boton-discreto peligro" id="boton-vaciar-si">Vaciar</button>
+          <button type="button" class="boton-discreto" id="boton-vaciar-no">Cancelar</button>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Difusión ------------------------------------------------------------ -->
+    <section class="vista" id="vista-difusion" role="tabpanel" aria-labelledby="tab-difusion">
+      <div class="difusion">
+        <div class="difusion-principal">
+          <div class="resultado" aria-live="polite">
+            <p class="resultado-ayuda" id="resultado-ayuda"></p>
+            <div class="resultado-datos" id="resultado-datos" hidden>
+              <p class="cadena" id="cadena"></p>
+              <p class="tiempo" id="tiempo"><span class="tiempo-numero" id="tiempo-numero"></span><span class="tiempo-unidad">min</span></p>
+            </div>
+          </div>
+
+          <div class="lienzo" id="lienzo">
+            <svg id="grafo" viewBox="0 0 800 500" role="img" aria-label="Grafo de la red social"></svg>
+            <p class="vacio lienzo-vacio" id="grafo-vacio" hidden>Todavía no hay usuarios. Agregá uno o cargá la demo.</p>
+            <div class="flotante" id="flotante" hidden></div>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <div class="segmentado" id="modo" role="radiogroup" aria-label="Modo">
+            <button type="button" role="radio" aria-checked="true" data-modo="consultar">Consultar</button>
+            <button type="button" role="radio" aria-checked="false" data-modo="editar">Editar</button>
+          </div>
+
+          <div class="panel-modo" id="panel-consultar">
+            <div class="campos-dos">
+              <label class="campo"><span>Origen</span><select id="select-origen"></select></label>
+              <label class="campo"><span>Destino</span><select id="select-destino"></select></label>
+            </div>
+            <p class="error" id="error-consulta" role="alert"></p>
+
+            <div class="pasos" id="pasos" hidden>
+              <div class="pasos-cabecera">
+                <h2 class="titulo-chico">Paso a paso</h2>
+                <span class="pasos-contador" id="pasos-contador"></span>
+              </div>
+              <div class="pasos-progreso"><span id="pasos-barra"></span></div>
+              <div class="pasos-controles">
+                <button type="button" class="boton-control" id="paso-reiniciar">Reiniciar</button>
+                <button type="button" class="boton-control" id="paso-anterior">Anterior</button>
+                <button type="button" class="boton-control" id="paso-siguiente">Siguiente</button>
+                <button type="button" class="boton-control principal" id="paso-reproducir">Reproducir</button>
+              </div>
+              <ol class="decision" id="decision" aria-live="polite"></ol>
+              <details class="traza">
+                <summary>Traza completa</summary>
+                <ol id="traza"></ol>
+              </details>
+            </div>
+          </div>
+
+          <div class="panel-modo" id="panel-editar" hidden>
+            <form class="form-panel" id="form-usuario">
+              <h2 class="titulo-chico">Agregar usuario</h2>
+              <div class="fila-form">
+                <input type="text" id="usuario-nombre" placeholder="Nombre" required maxlength="40"
+                       autocomplete="off" aria-label="Nombre">
+                <button type="submit" class="boton">Agregar</button>
+              </div>
+              <p class="error" role="alert"></p>
+            </form>
+
+            <form class="form-panel" id="form-vinculo">
+              <h2 class="titulo-chico">Agregar vínculo</h2>
+              <div class="campos-dos">
+                <label class="campo"><span>Origen</span><select id="vinculo-origen" required></select></label>
+                <label class="campo"><span>Destino</span><select id="vinculo-destino" required></select></label>
+              </div>
+              <div class="fila-form">
+                <label class="campo campo-minutos"><span>Minutos</span>
+                  <input type="number" id="vinculo-minutos" min="1" step="1" required></label>
+                <button type="submit" class="boton">Agregar</button>
+              </div>
+              <p class="error" role="alert"></p>
+            </form>
+
+            <p class="nota">Atajo: click en un usuario y después en otro para crear un vínculo entre los dos.
+              Click en un usuario o en una flecha para eliminarlos.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. Muro ---------------------------------------------------------------- -->
+    <section class="vista" id="vista-muro" role="tabpanel" aria-labelledby="tab-muro" hidden>
+      <form class="form-linea" id="form-publicacion">
+        <label class="campo campo-autor"><span>Autor</span>
+          <input type="text" id="pub-autor" list="autores" required maxlength="40" autocomplete="off"></label>
+        <datalist id="autores"></datalist>
+        <label class="campo campo-fecha"><span>Fecha y hora</span>
+          <input type="datetime-local" id="pub-fecha" required></label>
+        <label class="campo campo-num"><span>Reacciones</span>
+          <input type="number" id="pub-reacciones" min="0" step="1" value="0" required></label>
+        <label class="campo campo-num"><span>Comentarios</span>
+          <input type="number" id="pub-comentarios" min="0" step="1" value="0" required></label>
+        <button type="submit" class="boton">Publicar</button>
+        <p class="error" role="alert"></p>
+      </form>
+
+      <div class="muro-barra">
+        <div class="segmentado" id="muro-orden" role="radiogroup" aria-label="Orden del muro">
+          <button type="button" role="radio" aria-checked="true" data-orden="fecha">Más recientes</button>
+          <button type="button" role="radio" aria-checked="false" data-orden="relevancia">Más relevantes</button>
+        </div>
+        <p class="criterio" id="muro-criterio"></p>
+      </div>
+
+      <div class="fila muro-encabezado" id="muro-encabezado" aria-hidden="true">
+        <span class="c-pos">#</span><span class="c-autor">Autor</span><span class="c-fecha">Fecha</span>
+        <span class="c-reac">Reacciones</span><span class="c-com">Comentarios</span>
+        <span class="c-rel">Relevancia</span><span class="c-quitar"></span>
+      </div>
+      <ol class="muro-lista" id="muro-lista"></ol>
+      <p class="vacio" id="muro-vacio" hidden>Todavía no hay publicaciones. Publicá una o cargá la demo.</p>
+      <p class="error" id="muro-error" role="alert"></p>
+    </section>
+
+    <!-- 3. Iniciativas --------------------------------------------------------- -->
+    <section class="vista" id="vista-iniciativas" role="tabpanel" aria-labelledby="tab-iniciativas" hidden>
+      <div class="ini-superior">
+        <div class="presupuesto">
+          <label class="presupuesto-titulo" for="presupuesto-numero">Presupuesto</label>
+          <div class="presupuesto-control">
+            <input type="range" id="presupuesto-rango" min="0" max="0" step="1" value="0" aria-label="Presupuesto">
+            <input type="number" id="presupuesto-numero" min="0" step="1" value="0">
+          </div>
+          <p class="error" id="error-presupuesto" role="alert"></p>
+        </div>
+
+        <form class="form-linea form-iniciativa" id="form-iniciativa">
+          <label class="campo campo-num"><span>Costo</span>
+            <input type="number" id="ini-costo" min="1" step="1" required></label>
+          <label class="campo campo-num"><span>Impacto</span>
+            <input type="number" id="ini-impacto" min="0" step="1" required></label>
+          <button type="submit" class="boton">Agregar</button>
+          <p class="error" role="alert"></p>
+        </form>
+      </div>
+
+      <div class="metricas" aria-live="polite">
+        <div class="metrica"><span class="metrica-valor" id="m-impacto">0</span><span class="metrica-nombre">Impacto total</span></div>
+        <div class="metrica"><span class="metrica-valor" id="m-costo">0</span><span class="metrica-nombre">Costo total</span></div>
+        <div class="metrica"><span class="metrica-valor" id="m-restante">0</span><span class="metrica-nombre">Presupuesto restante</span></div>
+      </div>
+
+      <div class="barra-presupuesto" id="barra-presupuesto" role="img"></div>
+      <div class="barra-escala"><span>0</span><span id="escala-max"></span></div>
+
+      <p class="criterio">Mochila 0/1 por programación dinámica: de todas las combinaciones que no pasan el
+        presupuesto, elige la de mayor impacto total.</p>
+
+      <div class="tarjetas" id="tarjetas"></div>
+      <p class="vacio" id="ini-vacio" hidden>Todavía no hay iniciativas. Agregá una o cargá la demo.</p>
+      <p class="error" id="ini-error" role="alert"></p>
+    </section>
+  </main>
 </body>
 </html>

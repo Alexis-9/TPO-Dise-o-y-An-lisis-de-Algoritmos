@@ -1,0 +1,209 @@
+/* =========================================================================
+   Red universitaria — estilos
+   Escala de grises + un solo color de acento. El acento se reserva para los
+   resultados (camino, iniciativas elegidas, filas nuevas) y el foco.
+   ========================================================================= */
+
+:root {
+  --fondo: #fafaf8;
+  --superficie: #ffffff;
+  --hover: #efefec;
+  --texto: #1d1d1f;
+  --texto-2: #5c5f63;
+  --texto-3: #94979b;
+  --linea: #e3e3df;
+  --linea-fuerte: #c8c8c3;
+
+  --nodo: #ffffff;
+  --nodo-borde: #85878a;
+  --arista: #b3b4b1;
+
+  --acento: #2f5ad6;
+  --acento-suave: #e8edfb;
+  --acento-texto: #ffffff;
+  --error: #c4302b;
+
+  --radio: 6px;
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #151517;
+    --superficie: #1c1c1f;
+    --hover: #26262a;
+    --texto: #ececee;
+    --texto-2: #a5a6ab;
+    --texto-3: #6d6e74;
+    --linea: #2b2b30;
+    --linea-fuerte: #404046;
+
+    --nodo: #1c1c1f;
+    --nodo-borde: #8b8c92;
+    --arista: #56575d;
+
+    --acento: #7b9bff;
+    --acento-suave: #222a44;
+    --acento-texto: #0e1222;
+    --error: #ff7a70;
+  }
+}
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 15px/1.5 var(--fuente);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+h2 { margin: 0; }
+
+/* ---------- Encabezado ---------- */
+
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--linea);
+}
+
+.barra-interior {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.marca { display: flex; flex-direction: column; line-height: 1.25; }
+.marca-nombre { font-weight: 600; letter-spacing: -0.01em; }
+.marca-sub { font-size: 12px; color: var(--texto-3); }
+
+.pestanas { display: flex; align-self: stretch; gap: 4px; }
+
+.pestana {
+  position: relative;
+  border: 0;
+  background: none;
+  padding: 0 14px;
+  color: var(--texto-2);
+  cursor: pointer;
+}
+.pestana:hover { color: var(--texto); }
+.pestana[aria-selected="true"] { color: var(--texto); font-weight: 500; }
+.pestana[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--texto);
+}
+
+.globales { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+.globales .error { margin: 0 10px 0 0; }
+.confirmar { display: inline-flex; align-items: center; gap: 2px; }
+.confirmar-texto { font-size: 13.5px; color: var(--texto-2); margin: 0 6px 0 10px; }
+
+.boton-discreto {
+  border: 0;
+  background: none;
+  padding: 6px 10px;
+  border-radius: var(--radio);
+  font-size: 13.5px;
+  color: var(--texto-2);
+  cursor: pointer;
+}
+.boton-discreto:hover { background: var(--hover); color: var(--texto); }
+.boton-discreto.peligro { color: var(--error); font-weight: 500; }
+
+main { max-width: 1280px; margin: 0 auto; padding: 32px 32px 80px; }
+
+/* ---------- Formularios (discretos) ---------- */
+
+.campo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.campo > span { font-size: 12px; color: var(--texto-3); }
+
+input[type="text"], input[type="number"], input[type="datetime-local"], select {
+  height: 34px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+input[type="number"] { font-variant-numeric: tabular-nums; }
+input:hover, select:hover { border-color: var(--linea-fuerte); }
+input:focus, select:focus { outline: 2px solid var(--acento); outline-offset: -1px; border-color: transparent; }
+
+.boton {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.boton:hover { border-color: var(--texto-3); }
+.boton:active { background: var(--hover); }
+
+.form-linea { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+.form-linea .error { flex-basis: 100%; margin: 0; }
+
+.error { margin: 6px 0 0; font-size: 12.5px; color: var(--error); }
+.error:empty { display: none; }
+
+.titulo-chico { font-size: 13px; font-weight: 600; }
+.nota, .criterio { font-size: 12.5px; color: var(--texto-3); margin: 0; }
+.vacio { color: var(--texto-3); }
+
+/* ---------- Control segmentado ---------- */
+
+.segmentado {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--superficie);
+}
+.segmentado button {
+  border: 0;
+  background: none;
+  padding: 5px 13px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: var(--texto-2);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.segmentado button:hover { color: var(--texto); }
+.segmentado button[aria-checked="true"] { background: var(--texto); color: var(--fondo); }
+
+/* ---------- Pantallas chicas ---------- */
+
+@media (max-width: 900px) {
+  .barra-interior { flex-wrap: wrap; gap: 0 16px; padding: 8px 16px 0; }
+  .pestanas { order: 3; flex-basis: 100%; min-height: 44px; margin-left: -14px; overflow-x: auto; }
+  .globales { flex-wrap: wrap; justify-content: flex-end; }
+  main { padding: 24px 16px 60px; }
+}
