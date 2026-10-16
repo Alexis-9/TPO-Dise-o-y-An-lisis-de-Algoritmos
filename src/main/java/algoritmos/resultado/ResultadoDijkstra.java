@@ -2,6 +2,7 @@ package algoritmos.resultado;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class ResultadoDijkstra<T> {
@@ -10,14 +11,17 @@ public class ResultadoDijkstra<T> {
     private final Map<T, Integer> distancias;
     private final Map<T, T> predecesores;
     private final ArrayList<String> traza;
+    private final ArrayList<PasoDijkstra<T>> pasos;
 
     public ResultadoDijkstra(T origen, Map<T, Integer> distancias,
                              Map<T, T> predecesores,
-                             ArrayList<String> traza) {
+                             ArrayList<String> traza,
+                             ArrayList<PasoDijkstra<T>> pasos) {
         this.origen = origen;
         this.distancias = distancias;
         this.predecesores = predecesores;
         this.traza = traza;
+        this.pasos = pasos;
     }
 
     public int getDistancia(T destino) {
@@ -66,6 +70,10 @@ public class ResultadoDijkstra<T> {
 
     public ArrayList<String> getTraza() {
         return traza;
+    }
+
+    public List<PasoDijkstra<T>> getPasos() {
+        return Collections.unmodifiableList(pasos);
     }
 
     public T getOrigen() {

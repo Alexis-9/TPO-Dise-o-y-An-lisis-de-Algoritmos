@@ -1,5 +1,6 @@
 package algoritmos;
 
+import algoritmos.resultado.PasoDijkstra;
 import algoritmos.resultado.ResultadoDijkstra;
 import model.interfaces.Arista;
 import model.interfaces.Grafo;
@@ -24,6 +25,7 @@ public class Dijsktra {
         Map<T, T> predecesores = new HashMap<>();
         Set<T> visitados = new HashSet<>();
         ArrayList<String> traza = new ArrayList<>();
+        ArrayList<PasoDijkstra<T>> pasos = new ArrayList<>();
 
         distancias.put(origen, 0);
         traza.add("Inicio: " + origen + " con tiempo 0 min");
@@ -40,6 +42,10 @@ public class Dijsktra {
             visitados.add(actual);
             int tiempoActual = distancias.get(actual);
             traza.add("Selecciona " + actual + ": tiempo definitivo " + tiempoActual + " min");
+            ArrayList<PasoDijkstra.Actualizacion<T>> actualizaciones = new ArrayList<>();
+            ArrayList<String> decisiones = new ArrayList<>();
+            decisiones.add(traza.get(traza.size() - 1));
+            pasos.add(new PasoDijkstra<>(actual, tiempoActual, actualizaciones, decisiones));
 
             for (Arista<T> arista : grafo.getAdyacentes(actual)) {
                 T vecino = arista.getDestino();
@@ -54,14 +60,17 @@ public class Dijsktra {
                     traza.add("   Actualiza " + vecino + ": "
                             + (tiempoConocido == null ? "sin camino" : tiempoConocido + " min")
                             + " -> " + tiempoNuevo + " min (vía " + actual + ")");
+                    actualizaciones.add(new PasoDijkstra.Actualizacion<>(vecino, tiempoConocido, tiempoNuevo));
+                    decisiones.add(traza.get(traza.size() - 1));
                 } else {
                     traza.add("   Descarta " + arista + ": " + tiempoNuevo
                             + " min no mejora " + tiempoConocido + " min");
+                    decisiones.add(traza.get(traza.size() - 1));
                 }
             }
         }
 
-        return new ResultadoDijkstra<>(origen, distancias, predecesores, traza);
+        return new ResultadoDijkstra<>(origen, distancias, predecesores, traza, pasos);
     }
 
     private static <T extends Comparable<T>> T seleccionarMasCercano(Grafo<T> grafo, Map<T, Integer> distancias,
