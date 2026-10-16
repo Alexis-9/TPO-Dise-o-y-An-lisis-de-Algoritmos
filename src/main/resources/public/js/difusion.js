@@ -1,6 +1,6 @@
-// Vista Difusión: grafo de la red y cadena más rápida (Dijkstra) con paso a paso.
+// Vista Difusión: grafo de la red, cadena más rápida (Dijkstra) con paso a paso y edición.
 // Todo resultado sale de la API; acá solo se decide qué se ve en cada momento.
-import { api } from './api.js';
+import { api, numero } from './api.js';
 import { Grafo } from './grafo.js';
 
 const VELOCIDAD = 1100; // ms entre pasos al reproducir
@@ -15,6 +15,11 @@ const estado = {
   cuadro: 0,           // 0 = inicio, 1..n = después de cada paso, n + 1 = resultado
   reproduccion: null,
   consulta: 0,         // número del último pedido, para descartar respuestas viejas
+  // Editar
+  seleccionado: null,  // usuario elegido con un click
+  aristaSel: null,     // { origen, destino } elegida con un click
+  nuevo: null,         // { origen, destino } del vínculo que se está creando con el atajo
+  ancla: null,         // función que da el punto del SVG donde va el cuadro flotante
 };
 
 let grafo;
@@ -47,6 +52,13 @@ export function iniciar() {
     reproducir: $('paso-reproducir'),
     decision: $('decision'),
     traza: $('traza'),
+    flotante: $('flotante'),
+    formUsuario: $('form-usuario'),
+    nombre: $('usuario-nombre'),
+    formVinculo: $('form-vinculo'),
+    vinculoOrigen: $('vinculo-origen'),
+    vinculoDestino: $('vinculo-destino'),
+    vinculoMinutos: $('vinculo-minutos'),
   };
 
   grafo = new Grafo(el.svg, { alClickNodo, alClickArista, alClickFondo });
@@ -62,6 +74,19 @@ export function iniciar() {
   el.anterior.addEventListener('click', () => { pausar(); irA(estado.cuadro - 1); });
   el.siguiente.addEventListener('click', () => { pausar(); irA(estado.cuadro + 1); });
   el.reproducir.addEventListener('click', alternarReproduccion);
+
+  el.formUsuario.addEventListener('submit', agregarUsuario);
+  el.formVinculo.addEventListener('submit', agregarVinculo);
+  for (const form of [el.formUsuario, el.formVinculo]) {
+    form.addEventListener('input', () => { form.querySelector('.error').textContent = ''; });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && estado.modo === 'editar' && hayEdicionEnCurso()) {
+      cancelarEdicion();
+      pintar();
+    }
+  });
+  window.addEventListener('resize', ubicarFlotante);
 }
 
 export async function refrescar() {
@@ -79,6 +104,8 @@ export async function refrescar() {
   if (!ids.has(estado.origen)) estado.origen = null;
   if (!ids.has(estado.destino)) estado.destino = null;
 
+  cancelarEdicion();
+  for (const error of el.panelEditar.querySelectorAll('.error')) error.textContent = '';
   llenarSelects();
   el.vacio.hidden = estado.usuarios.length > 0;
   const animacion = grafo.actualizar(estado.usuarios, estado.vinculos);
@@ -115,10 +142,14 @@ function opcion(valor, texto) {
 }
 
 function llenarSelects() {
-  for (const select of [el.selectOrigen, el.selectDestino]) {
+  const selects = [el.selectOrigen, el.selectDestino, el.vinculoOrigen, el.vinculoDestino];
+  const anteriores = selects.map((s) => s.value);
+  selects.forEach((select, i) => {
     select.replaceChildren(opcion('', 'Elegí…'), ...estado.usuarios.map((u) => opcion(u.id, u.nombre)));
     select.disabled = estado.usuarios.length === 0;
-  }
+    select.value = anteriores[i];
+    if (select.selectedIndex < 0) select.value = '';
+  });
   el.selectOrigen.value = estado.origen ?? '';
   el.selectDestino.value = estado.destino ?? '';
 }
@@ -135,6 +166,7 @@ function cambiarModo(modo) {
   el.panelEditar.hidden = modo !== 'editar';
   el.lienzo.classList.toggle('editando', modo === 'editar');
   pausar();
+  cancelarEdicion();
 
   if (modo === 'consultar' && estado.origen != null && estado.destino != null) {
     consultar();
@@ -146,16 +178,29 @@ function cambiarModo(modo) {
 // ---------------------------------------------------------------- clicks en el grafo
 
 function alClickNodo(id) {
-  if (estado.modo !== 'consultar') return;
+  if (estado.modo === 'editar') {
+    clickNodoEditando(id);
+    return;
+  }
   // Primer click: origen. Segundo: destino. Tercero: reinicia.
   if (estado.origen == null) elegir(id, null);
   else if (estado.destino == null) elegir(estado.origen, id);
   else elegir(null, null);
 }
 
-function alClickArista() { }
+function alClickArista(origen, destino) {
+  if (estado.modo !== 'editar') return;
+  cancelarEdicion();
+  estado.aristaSel = { origen, destino };
+  mostrarEliminarVinculo(origen, destino);
+  pintar();
+}
 
-function alClickFondo() { }
+function alClickFondo() {
+  if (estado.modo !== 'editar' || !hayEdicionEnCurso()) return;
+  cancelarEdicion();
+  pintar();
+}
 
 // ---------------------------------------------------------------- consulta
 
@@ -188,6 +233,147 @@ async function consultar() {
     el.errorConsulta.textContent = e.message;
   }
   pintar();
+}
+
+// ---------------------------------------------------------------- edición
+
+function hayEdicionEnCurso() {
+  return estado.seleccionado != null || estado.aristaSel != null || estado.nuevo != null;
+}
+
+function clickNodoEditando(id) {
+  const seleccionado = estado.seleccionado;
+  cancelarEdicion();
+
+  if (seleccionado == null) {
+    // Primer click: el usuario queda elegido; se puede eliminar o seguir con otro para vincular
+    estado.seleccionado = id;
+    mostrarEliminarUsuario(id);
+  } else if (seleccionado !== id) {
+    // Segundo click en otro usuario: atajo para crear el vínculo
+    estado.nuevo = { origen: seleccionado, destino: id };
+    grafo.mostrarPrevia(seleccionado, id);
+    mostrarMinutos(seleccionado, id);
+  }
+  pintar();
+}
+
+function cancelarEdicion() {
+  estado.seleccionado = null;
+  estado.aristaSel = null;
+  estado.nuevo = null;
+  estado.ancla = null;
+  grafo?.quitarPrevia();
+  if (el) {
+    el.flotante.hidden = true;
+    el.flotante.replaceChildren();
+  }
+}
+
+function crearElemento(etiqueta, clase, texto) {
+  const elemento = document.createElement(etiqueta);
+  if (clase) elemento.className = clase;
+  if (texto != null) elemento.textContent = texto;
+  return elemento;
+}
+
+/** Cuadro chico sobre el grafo. lugar: 'debajo' de un nodo o en el 'medio' de una flecha. */
+function mostrarFlotante(contenido, ancla, lugar) {
+  el.flotante.replaceChildren(...contenido);
+  el.flotante.dataset.lugar = lugar;
+  el.flotante.hidden = false;
+  estado.ancla = ancla;
+  ubicarFlotante();
+}
+
+function ubicarFlotante() {
+  if (!estado.ancla || el.flotante.hidden) return;
+  const punto = estado.ancla();
+  if (!punto) return;
+  const { left, top } = grafo.aPantalla(punto);
+  el.flotante.style.left = `${left}px`;
+  el.flotante.style.top = `${top}px`;
+}
+
+function mostrarEliminarUsuario(id) {
+  const error = crearElemento('p', 'error');
+  const boton = crearElemento('button', 'boton-flotante peligro', 'Eliminar usuario');
+  boton.type = 'button';
+  boton.addEventListener('click', () => ejecutar(() => api.eliminarUsuario(id), error));
+  const pista = crearElemento('p', 'flotante-pista', `o click en otro usuario para crear un vínculo desde ${nombreDe(id)}`);
+
+  mostrarFlotante([boton, pista, error], () => {
+    const c = grafo.centro(id);
+    return c && { x: c.x, y: c.y + grafo.radioNodo + 8 };
+  }, 'debajo');
+}
+
+function mostrarEliminarVinculo(origen, destino) {
+  const vinculo = estado.vinculos.find((v) => v.origen === origen && v.destino === destino);
+  const error = crearElemento('p', 'error');
+  const ruta = crearElemento('p', 'flotante-ruta',
+    `${nombreDe(origen)} → ${nombreDe(destino)} · ${vinculo?.minutos ?? ''} min`);
+  const boton = crearElemento('button', 'boton-flotante peligro', 'Eliminar vínculo');
+  boton.type = 'button';
+  boton.addEventListener('click', () => ejecutar(() => api.eliminarVinculo(origen, destino), error));
+
+  mostrarFlotante([ruta, boton, error], () => grafo.medioArista(origen, destino), 'medio');
+}
+
+function mostrarMinutos(origen, destino) {
+  const error = crearElemento('p', 'error');
+  const ruta = crearElemento('p', 'flotante-ruta', `${nombreDe(origen)} → ${nombreDe(destino)}`);
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '1';
+  input.step = '1';
+  input.placeholder = 'min';
+  input.setAttribute('aria-label', 'Minutos del vínculo');
+  const pista = crearElemento('p', 'flotante-pista', 'Enter para crear · Esc para cancelar');
+
+  input.addEventListener('input', () => { error.textContent = ''; });
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    ejecutar(() => api.crearVinculo(origen, destino, numero(input)), error, input);
+  });
+
+  mostrarFlotante([ruta, input, pista, error], () => grafo.medioArista(origen, destino), 'medio');
+  input.focus();
+}
+
+/** Ejecuta una carga contra la API: si sale bien vuelve a pedir la red, si no muestra el error. */
+async function ejecutar(accion, error, foco = null) {
+  error.textContent = '';
+  try {
+    await accion();
+  } catch (e) {
+    error.textContent = e.message;
+    foco?.focus();
+    foco?.select?.();
+    return false;
+  }
+  cancelarEdicion();
+  await refrescar();
+  return true;
+}
+
+async function agregarUsuario(e) {
+  e.preventDefault();
+  const error = el.formUsuario.querySelector('.error');
+  if (await ejecutar(() => api.crearUsuario(el.nombre.value), error, el.nombre)) {
+    el.nombre.value = '';
+    el.nombre.focus();
+  }
+}
+
+async function agregarVinculo(e) {
+  e.preventDefault();
+  const error = el.formVinculo.querySelector('.error');
+  const pedido = () => api.crearVinculo(valorDe(el.vinculoOrigen), valorDe(el.vinculoDestino), numero(el.vinculoMinutos));
+  if (await ejecutar(pedido, error, el.vinculoMinutos)) {
+    el.vinculoMinutos.value = '';
+  }
 }
 
 // ---------------------------------------------------------------- paso a paso
@@ -238,6 +424,7 @@ function pintar() {
 }
 
 function estiloActual() {
+  if (estado.modo === 'editar') return estiloEdicion();
   const r = estado.resultado;
   if (!r) return estiloSeleccion();
   if (estado.cuadro >= ultimoCuadro()) return r.alcanzable ? estiloCamino(r) : estiloInalcanzable(r);
@@ -256,6 +443,15 @@ function distanciasDefinitivas(r) {
   const definitivas = new Map();
   for (const paso of r.pasos) definitivas.set(paso.elegido, paso.distancia);
   return definitivas;
+}
+
+function estiloEdicion() {
+  const marcados = new Set([estado.seleccionado, estado.nuevo?.origen, estado.nuevo?.destino]);
+  const arista = estado.aristaSel;
+  return {
+    nodo: (id) => (marcados.has(id) ? 'seleccionado' : ''),
+    arista: (o, d) => (arista && arista.origen === o && arista.destino === d ? 'seleccionada' : ''),
+  };
 }
 
 function estiloSeleccion() {

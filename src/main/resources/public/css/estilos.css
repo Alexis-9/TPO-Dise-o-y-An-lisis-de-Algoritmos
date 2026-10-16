@@ -301,6 +301,52 @@ input:focus, select:focus { outline: 2px solid var(--acento); outline-offset: -1
 .flecha path { fill: var(--arista); }
 .flecha-acento path { fill: var(--acento); }
 
+/* Edición */
+.lienzo.editando .arista .toque { pointer-events: stroke; cursor: pointer; }
+.lienzo.editando .arista:hover .linea { stroke: var(--texto-2); }
+.arista.seleccionada .linea { stroke: var(--acento); stroke-width: 2.5; }
+.arista.seleccionada .minutos { fill: var(--acento); font-weight: 600; }
+.cuerpo.seleccionado circle { stroke: var(--acento); stroke-width: 2.5; stroke-dasharray: 5 3; }
+.previa { fill: none; stroke: var(--acento); stroke-width: 2; stroke-dasharray: 6 4; pointer-events: none; }
+
+.flotante {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  max-width: 250px;
+  padding: 8px 12px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 8px;
+  background: var(--superficie);
+  box-shadow: 0 1px 3px rgb(0 0 0 / .06);
+  text-align: center;
+}
+.flotante[data-lugar="medio"] { transform: translate(-50%, -50%); }
+.flotante input { width: 90px; height: 30px; text-align: center; }
+.flotante .error { margin: 0; }
+.flotante-ruta { margin: 0; font-size: 12.5px; font-weight: 500; }
+.flotante-pista { margin: 0; font-size: 11.5px; color: var(--texto-3); }
+.boton-flotante {
+  border: 0;
+  background: none;
+  padding: 2px 6px;
+  border-radius: var(--radio);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.boton-flotante:hover { background: var(--hover); }
+.boton-flotante.peligro { color: var(--error); }
+
+.form-panel { display: flex; flex-direction: column; gap: 10px; }
+.form-panel .error { margin: 0; }
+.fila-form { display: flex; align-items: flex-end; gap: 8px; }
+.fila-form input[type="text"], .campo-minutos { flex: 1; }
+
 /* Panel lateral */
 .panel { display: flex; flex-direction: column; gap: 22px; padding-top: 22px; }
 .panel .segmentado { align-self: flex-start; }
