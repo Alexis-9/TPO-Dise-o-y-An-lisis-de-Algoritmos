@@ -1,5 +1,5 @@
-package main.java.model.criterio;
-import main.java.model.Publicacion;
+package model.criterio;
+import model.Publicacion;
 
 public class CriterioFecha extends Criterio{
     public CriterioFecha(Publicacion publicacion) {

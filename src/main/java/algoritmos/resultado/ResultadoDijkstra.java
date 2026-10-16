@@ -1,4 +1,4 @@
-package main.java.algoritmos.resultado;
+package algoritmos.resultado;
 
 import java.util.ArrayList;
 import java.util.Collections;

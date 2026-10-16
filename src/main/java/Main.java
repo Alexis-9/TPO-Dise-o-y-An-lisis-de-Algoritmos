@@ -1,15 +1,13 @@
-package main.java;
-
-import main.java.algoritmos.resultado.ResultadoDijkstra;
-import main.java.controller.DifusionController;
-import main.java.controller.IniciativasController;
-import main.java.controller.PublicacionesController;
-import main.java.controller.UsuariosController;
-import main.java.model.Iniciativa;
-import main.java.model.Publicacion;
-import main.java.model.RedSocial;
-import main.java.model.Usuario;
-import main.java.model.Vinculo;
+import algoritmos.resultado.ResultadoDijkstra;
+import controller.DifusionController;
+import controller.IniciativasController;
+import controller.PublicacionesController;
+import controller.UsuariosController;
+import model.Iniciativa;
+import model.Publicacion;
+import model.RedSocial;
+import model.Usuario;
+import model.Vinculo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

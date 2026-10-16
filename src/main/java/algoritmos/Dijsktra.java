@@ -1,8 +1,8 @@
-package main.java.algoritmos;
+package algoritmos;
 
-import main.java.algoritmos.resultado.ResultadoDijkstra;
-import main.java.model.interfaces.Arista;
-import main.java.model.interfaces.Grafo;
+import algoritmos.resultado.ResultadoDijkstra;
+import model.interfaces.Arista;
+import model.interfaces.Grafo;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,8 +1,8 @@
-package main.java.controller;
+package controller;
 
-import main.java.algoritmos.Mochila;
-import main.java.algoritmos.resultado.ResultadoMochila;
-import main.java.model.Iniciativa;
+import algoritmos.Mochila;
+import algoritmos.resultado.ResultadoMochila;
+import model.Iniciativa;
 
 import java.util.ArrayList;
 

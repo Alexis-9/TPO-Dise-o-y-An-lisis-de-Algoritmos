@@ -1,6 +1,6 @@
-package main.java.algoritmos.resultado;
+package algoritmos.resultado;
 
-import main.java.model.interfaces.Valuable;
+import model.interfaces.Valuable;
 
 import java.util.ArrayList;
 

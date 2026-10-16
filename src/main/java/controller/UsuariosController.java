@@ -1,9 +1,9 @@
-package main.java.controller;
+package controller;
 
-import main.java.algoritmos.MergeSort;
-import main.java.model.RedSocial;
-import main.java.model.Usuario;
-import main.java.model.Vinculo;
+import algoritmos.MergeSort;
+import model.RedSocial;
+import model.Usuario;
+import model.Vinculo;
 import java.util.Arrays;
 import java.util.List;
 

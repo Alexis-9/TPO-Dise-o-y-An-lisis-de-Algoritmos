@@ -1,10 +1,10 @@
-package main.java.controller;
+package controller;
 
-import main.java.algoritmos.MergeSort;
-import main.java.model.Publicacion;
-import main.java.model.criterio.Criterio;
-import main.java.model.criterio.CriterioFecha;
-import main.java.model.criterio.CriterioRelevancia;
+import algoritmos.MergeSort;
+import model.Publicacion;
+import model.criterio.Criterio;
+import model.criterio.CriterioFecha;
+import model.criterio.CriterioRelevancia;
 
 import java.util.ArrayList;
 import java.util.function.Function;

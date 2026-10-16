@@ -1,6 +1,6 @@
-package main.java.model;
+package model;
 
-import main.java.model.interfaces.Grafo;
+import model.interfaces.Grafo;
 
 import java.util.*;
 
