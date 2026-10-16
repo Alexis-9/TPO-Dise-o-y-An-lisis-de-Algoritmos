@@ -2,8 +2,9 @@
 import { api } from './api.js';
 import * as difusion from './difusion.js';
 import * as muro from './muro.js';
+import * as iniciativas from './iniciativas.js';
 
-const vistas = { difusion, muro };
+const vistas = { difusion, muro, iniciativas };
 
 const NOMBRES = ['difusion', 'muro', 'iniciativas'];
 let vistaActual = null;
