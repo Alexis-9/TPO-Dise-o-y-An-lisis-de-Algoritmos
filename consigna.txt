@@ -1,0 +1,48 @@
+Una universidad desea desarrollar una plataforma para conectar estudiantes, difundir 
+oportunidades académicas y organizar actividades y equipos de trabajo. El sistema 
+administrará usuarios, publicaciones, vínculos entre usuarios e iniciativas universitarias.
+ 
+Primera etapa: funcionalidades obligatorias
+ 
+1. Organización del muro de publicaciones 
+Cada publicación posee un identificador, autor, fecha y hora, cantidad de reacciones y 
+cantidad de comentarios.
+ 
+El sistema deberá permitir consultar las publicaciones: 
+ Desde la más reciente hasta la más antigua. 
+ Desde la más relevante hasta la menos relevante. 
+
+En caso de empate, se priorizará la publicación más reciente y, luego, el identificador 
+menor.
+ 
+Se deberá implementar un procedimiento de ordenamiento adecuado para trabajar con 
+volúmenes crecientes de publicaciones, sin utilizar métodos de ordenamiento provistos 
+por Java. El equipo deberá explicar cómo funciona y analizar su complejidad temporal. 
+
+2. Cadena de difusión más rápida 
+
+Una convocatoria puede transmitirse entre usuarios mediante diferentes cadenas de 
+contactos. Cada vínculo habilitado tiene un sentido de transmisión y un tiempo estimado 
+positivo, expresado en minutos.
+ 
+Dados un usuario de origen y uno de destino, el sistema deberá determinar: 
+ La cadena que permita transmitir la convocatoria en el menor tiempo total. 
+ Los usuarios que integran esa cadena. 
+ El tiempo total estimado.
+ 
+Los tiempos de los vínculos se consideran fijos y se suman a lo largo de la cadena. Si el 
+destino no es alcanzable, el sistema deberá informarlo. 
+También deberá permitir visualizar las principales decisiones tomadas durante el 
+cálculo.
+ 
+3. Selección de iniciativas para financiar
+ 
+La universidad dispone de un presupuesto limitado para financiar iniciativas publicadas 
+en la plataforma. 
+Cada iniciativa posee un identificador, un costo entero positivo y un puntaje de impacto 
+entero no negativo. Una iniciativa podrá financiarse una sola vez y deberá recibir la 
+totalidad del dinero solicitado. 
+El sistema deberá seleccionar el conjunto de iniciativas que alcance el mayor impacto 
+total posible, sin superar el presupuesto disponible. 
+Deberá mostrar las iniciativas seleccionadas, el costo total, el impacto obtenido y el 
+presupuesto restante. 
