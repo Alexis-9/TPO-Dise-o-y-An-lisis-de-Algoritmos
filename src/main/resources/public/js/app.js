@@ -1,8 +1,9 @@
 // Pestañas y botones globales. Cada vista expone iniciar(), refrescar() y, si hace falta, ocultar().
 import { api } from './api.js';
 import * as difusion from './difusion.js';
+import * as muro from './muro.js';
 
-const vistas = { difusion };
+const vistas = { difusion, muro };
 
 const NOMBRES = ['difusion', 'muro', 'iniciativas'];
 let vistaActual = null;
