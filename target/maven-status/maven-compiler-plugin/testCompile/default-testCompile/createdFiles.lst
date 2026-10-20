@@ -1,0 +1,7 @@
+service\RedServiceTest.class
+service\IniciativasServiceTest.class
+service\MuroServiceTest.class
+datos\DatosDemoTest.class
+service\DifusionServiceTest.class
+datos\PlataformaTest.class
+service\DatosServiceTest.class
