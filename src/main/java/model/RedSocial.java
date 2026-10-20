@@ -1,6 +1,6 @@
-package main.java.model;
+package model;
 
-import main.java.model.interfaces.Grafo;
+import model.interfaces.Grafo;
 
 import java.util.*;
 
@@ -33,6 +33,32 @@ public class RedSocial implements Grafo<Usuario> {
         Vinculo vinculo = new Vinculo(origen,destino,minutos);
 
         adyacencia.get(origen).add(vinculo);
+    }
+
+    public void eliminarUsuario(int idUsuario){
+        Usuario usuario = usuarios.get(idUsuario);
+        if (usuario == null){throw new NoSuchElementException("No existe un usuario con id " + idUsuario);}
+
+        // Vínculos de entrada: están en las listas de los demás usuarios
+        for (ArrayList<Vinculo> salientes : adyacencia.values()) {
+            salientes.removeIf(vinculo -> vinculo.getDestino().equals(usuario));
+        }
+
+        // Vínculos de salida: se van con su propia lista de adyacencia
+        adyacencia.remove(usuario);
+        usuarios.remove(idUsuario);
+    }
+
+    public void eliminarVinculo(int idOrigen, int idDestino){
+        Usuario origen = usuarios.get(idOrigen);
+        Usuario destino = usuarios.get(idDestino);
+        if (origen == null){throw new NoSuchElementException("No existe un usuario con id " + idOrigen);}
+        if (destino == null){throw new NoSuchElementException("No existe un usuario con id " + idDestino);}
+
+        boolean eliminado = adyacencia.get(origen).removeIf(vinculo -> vinculo.getDestino().equals(destino));
+        if (!eliminado){
+            throw new NoSuchElementException("No hay un vínculo de " + origen.getNombre() + " a " + destino.getNombre());
+        }
     }
 
     private boolean existeVinculo(Usuario origen, Usuario destino){

@@ -1,4 +1,4 @@
-package main.java.model.interfaces;
+package model.interfaces;
 
 import java.util.Collection;
 import java.util.List;

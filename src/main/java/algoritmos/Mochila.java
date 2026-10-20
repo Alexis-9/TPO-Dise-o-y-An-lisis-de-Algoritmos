@@ -1,7 +1,7 @@
-package main.java.algoritmos;
+package algoritmos;
 
-import main.java.algoritmos.resultado.ResultadoMochila;
-import main.java.model.interfaces.Valuable;
+import algoritmos.resultado.ResultadoMochila;
+import model.interfaces.Valuable;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,6 @@
-package main.java.model;
+package model;
 
-import main.java.model.interfaces.Arista;
+import model.interfaces.Arista;
 
 public class Vinculo implements Arista<Usuario> {
 

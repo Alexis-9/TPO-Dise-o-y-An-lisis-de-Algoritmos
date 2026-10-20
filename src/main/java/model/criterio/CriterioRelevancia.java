@@ -1,6 +1,6 @@
-package main.java.model.criterio;
+package model.criterio;
 
-import main.java.model.Publicacion;
+import model.Publicacion;
 
 public class CriterioRelevancia extends Criterio{
     public CriterioRelevancia(Publicacion publicacion) {

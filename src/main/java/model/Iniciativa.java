@@ -1,6 +1,6 @@
-package main.java.model;
+package model;
 
-import main.java.model.interfaces.Valuable;
+import model.interfaces.Valuable;
 
 public class Iniciativa implements Valuable {
 

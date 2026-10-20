@@ -1,9 +1,9 @@
-package main.java.controller;
+package controller;
 
-import main.java.algoritmos.Dijsktra;
-import main.java.algoritmos.resultado.ResultadoDijkstra;
-import main.java.model.RedSocial;
-import main.java.model.Usuario;
+import algoritmos.Dijsktra;
+import algoritmos.resultado.ResultadoDijkstra;
+import model.RedSocial;
+import model.Usuario;
 
 public class DifusionController {
 
