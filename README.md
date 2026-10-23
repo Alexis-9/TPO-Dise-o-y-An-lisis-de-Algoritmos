@@ -3,10 +3,10 @@
 **Equipo: los aJAVAdos**
 
 | Integrante | GitHub |
-|---|---|---|
-| Alexis | [@Alexis-9](https://github.com/Alexis-9) 
-| Ralph | [@ralphjacoby1-web](https://github.com/ralphjacoby1-web) 
-| Martín | [@mstockl9](https://github.com/mstockl9) 
+|---|---|
+| Alexis | [@Alexis-9](https://github.com/Alexis-9) |
+| Ralph | [@ralphjacoby1-web](https://github.com/ralphjacoby1-web) |
+| Martín | [@mstockl9](https://github.com/mstockl9) |
 
 Propuesta elegida: **Propuesta 1 — Red social universitaria para la colaboración**.
 
@@ -17,10 +17,10 @@ La plataforma administra usuarios, publicaciones, vínculos entre usuarios e ini
 ## Funcionalidades de la primera etapa
 
 | # | Funcionalidad | Estrategia | Algoritmo |
-|---|---|---|---|---|
-| 1 | Organización del muro de publicaciones | Divide y Conquista | MergeSort genérico y estable
-| 2 | Cadena de difusión más rápida | Greedy | Dijkstra (versión de la Clase 4)
-| 3 | Selección de iniciativas para financiar | Programación Dinámica | Mochila 0/1 con reconstrucción
+|---|---|---|---|
+| 1 | Organización del muro de publicaciones | Divide y Conquista | MergeSort genérico y estable |
+| 2 | Cadena de difusión más rápida | Greedy | Dijkstra (versión de la Clase 4) |
+| 3 | Selección de iniciativas para financiar | Programación Dinámica | Mochila 0/1 con reconstrucción |
 
 
 ### 1. Muro de publicaciones
