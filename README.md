@@ -22,15 +22,14 @@ La plataforma administra usuarios, publicaciones, vínculos entre usuarios e ini
 | 2 | Cadena de difusión más rápida | Greedy | Dijkstra (versión de la Clase 4) |
 | 3 | Selección de iniciativas para financiar | Programación Dinámica | Mochila 0/1 con reconstrucción |
 
-
 ### 1. Muro de publicaciones
-Ordena las publicaciones por fecha (más reciente primero) o por relevancia (`reacciones + 3 × comentarios`). En los empates gana la más reciente y después el id menor. No usa métodos de ordenamiento de Java: MergeSort está implementado a mano sobre `Comparable`, con clases `Criterio` (`CriterioFecha`, `CriterioRelevancia`).
+Ordena las publicaciones por fecha (más reciente primero) o por relevancia (`reacciones + 3 × comentarios`). En los empates gana la más reciente y después el id menor. No usa métodos de ordenamiento nativos; se implementa mediante algoritmos sobre colecciones.
 
 ### 2. Cadena de difusión más rápida
-Dados un origen y un destino, calcula la cadena de menor tiempo total, los usuarios que la forman y el tiempo en minutos. Los vínculos son dirigidos y tienen tiempo positivo. Si el destino no es alcanzable, lo informa. Guarda una traza (`PasoDijkstra`) con las decisiones tomadas en cada paso del cálculo. Es genérico sobre las interfaces `Grafo<T>` y `Arista<T>`; los empates se resuelven por id menor.
+Dados un origen y un destino, calcula la cadena de menor tiempo total, los usuarios que la forman y el tiempo en minutos. Los vínculos son dirigidos y tienen tiempo positivo. Si el destino no es alcanzable, informa la situación sin errores.
 
 ### 3. Selección de iniciativas
-Con un presupuesto limitado, elige el conjunto de iniciativas de mayor impacto total sin superarlo. Cada iniciativa se financia completa y una sola vez. Muestra las iniciativas elegidas, el costo total, el impacto y el presupuesto restante. Se usa PD porque Greedy no garantiza el óptimo con ítems indivisibles (hay un test que lo demuestra: Greedy 200 vs. mochila 220).
+Con un presupuesto limitado, elige el conjunto de iniciativas de mayor impacto total sin superarlo. Cada iniciativa se financia completa y una sola vez. Muestra las iniciativas elegidas, el costo total y el beneficio acumulado.
 
 ---
 
@@ -44,15 +43,34 @@ Con un presupuesto limitado, elige el conjunto de iniciativas de mayor impacto t
 
 ## Estructura del proyecto
 
-src/main/java/
-├── model/ Usuario, Publicacion, Vinculo, Iniciativa, RedSocial
-│ └── interfaces/ Grafo<T>, Arista<T>
-├── algoritmos/ MergeSort, Criterios, Dijkstra, Mochila y sus resultados
-├── service/ Casos de uso (Muro, Difusión, Iniciativas, Red)
-├── datos/ Plataforma (estado en memoria) y DatosDemo
-├── web/ Servidor Javalin, controllers HTTP y DTOs
-└── view/ Menú de consola
-src/test/java/ Tests JUnit
+```text
+src/
+├── main/
+│   ├── java/
+│   │   ├── Main.java
+│   │   ├── algoritmos/
+│   │   │   ├── ...
+│   │   ├── datos/
+│   │   │   ├── DatosDemo.java
+│   │   │   └── Plataforma.java
+│   │   ├── model/
+│   │   │   ├── ...
+│   │   ├── service/
+│   │   │   ├── ...
+│   │   ├── view/
+│   │   │   └── MenuConsola.java
+│   │   └── web/
+│   │       ├── ApiServer.java
+│   │       └── controller/
+│   └── resources/
+│       └── ...
+└── test/
+    └── java/
+        ├── algoritmos/
+        ├── datos/
+        └── service/
+```
+
 ---
 
 ## Cómo ejecutarlo
@@ -64,7 +82,7 @@ Requisitos: Java 17+ y Maven.
 mvn test
 
 # Levantar la aplicación web
-mvn compile exec:java -Dexec.mainClass="<CLASE_MAIN_WEB>"
+mvn compile exec:java
 ```
 
 Después abrir `http://localhost:7070` en el navegador. La aplicación arranca con los datos de `DatosDemo` y desde el frontend se pueden cargar y borrar usuarios, vínculos, publicaciones e iniciativas.
