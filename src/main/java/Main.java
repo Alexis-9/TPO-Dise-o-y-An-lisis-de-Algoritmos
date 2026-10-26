@@ -24,7 +24,11 @@ public class Main {
     private static final int PUERTO_POR_DEFECTO = 7070;
 
     public static void main(String[] args) {
-        int puerto = args.length > 0 ? Integer.parseInt(args[0]) : PUERTO_POR_DEFECTO;
+        // En la nube (Render) el puerto llega por la variable de entorno PORT
+        String puertoEntorno = System.getenv("PORT");
+        int puerto = args.length > 0 ? Integer.parseInt(args[0])
+                : puertoEntorno != null ? Integer.parseInt(puertoEntorno)
+                : PUERTO_POR_DEFECTO;
 
         Plataforma plataforma = new Plataforma();
         DatosDemo datosDemo = new DatosDemo();
