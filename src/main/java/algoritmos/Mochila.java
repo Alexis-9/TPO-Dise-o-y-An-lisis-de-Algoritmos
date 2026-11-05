@@ -2,11 +2,9 @@ package algoritmos;
 
 import algoritmos.resultado.ResultadoMochila;
 import model.interfaces.Valuable;
-import service.SeleccionIniciativas;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class Mochila<T extends Valuable> {
 
