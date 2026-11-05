@@ -2,15 +2,19 @@ package algoritmos;
 
 import algoritmos.resultado.ResultadoMochila;
 import model.interfaces.Valuable;
+import service.SeleccionIniciativas;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Mochila<T extends Valuable> {
 
     private Mochila() { }
 
     public static <T extends Valuable> ResultadoMochila<T> resolver(ArrayList<T> objetos, int capacidadMax) {
+
+        if (capacidadMax == 0 || objetos.isEmpty()) { return new ResultadoMochila<>(new ArrayList<>(), 0, 0, capacidadMax); }
 
         int[][] matriz = new int[objetos.size()][capacidadMax + 1];
 

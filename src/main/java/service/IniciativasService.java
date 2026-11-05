@@ -30,12 +30,6 @@ public class IniciativasService {
 
         ArrayList<Iniciativa> iniciativas = new ArrayList<>(listar());
 
-        // Mochila falla con la lista vacía (bug conocido, lo arregla otro integrante):
-        // sin iniciativas no hay nada que elegir, así que no se la llama.
-        if (iniciativas.isEmpty()) {
-            return new SeleccionIniciativas(presupuesto, List.of(), 0, 0, presupuesto);
-        }
-
         // La tabla de la mochila tiene una columna por unidad de presupuesto. Si alcanza para
         // todas, de más no cambia la elección: se acota a la suma de los costos para que la
         // tabla no crezca sin sentido (y el restante se calcula sobre el presupuesto real).
