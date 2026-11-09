@@ -26,6 +26,12 @@ public class Plataforma {
     private final List<Publicacion> publicaciones = new ArrayList<>();
     private final List<Iniciativa> iniciativas = new ArrayList<>();
 
+    /**
+     * Sube cada vez que cambia la red (usuarios o vínculos). Sirve para saber si un resultado
+     * calculado antes sigue valiendo, sin comparar la red entera.
+     */
+    private long versionRed = 0;
+
     // ------------------------------------------------------------------
     // Usuarios y vínculos
     // ------------------------------------------------------------------
@@ -38,11 +44,13 @@ public class Plataforma {
 
         Usuario usuario = new Usuario(id, nombre);
         red.agregarUsuario(usuario);
+        versionRed++;
         return usuario;
     }
 
     public synchronized void eliminarUsuario(int idUsuario) {
         red.eliminarUsuario(idUsuario);
+        versionRed++;
     }
 
     public synchronized Usuario getUsuario(int idUsuario) {
@@ -55,6 +63,7 @@ public class Plataforma {
 
     public synchronized Vinculo agregarVinculo(int idOrigen, int idDestino, int minutos) {
         red.agregarVinculo(idOrigen, idDestino, minutos);
+        versionRed++;
 
         Usuario origen = red.getUsuario(idOrigen);
         for (Vinculo v : red.getVinculosSalientes(origen)) {
@@ -65,10 +74,16 @@ public class Plataforma {
 
     public synchronized void eliminarVinculo(int idOrigen, int idDestino) {
         red.eliminarVinculo(idOrigen, idDestino);
+        versionRed++;
     }
 
     public synchronized List<Vinculo> getVinculos() {
         return new ArrayList<>(red.getVinculos());
+    }
+
+    /** Versión actual de la red; cambia con cada alta o baja de usuarios o vínculos. */
+    public synchronized long getVersionRed() {
+        return versionRed;
     }
 
     /**
@@ -145,6 +160,7 @@ public class Plataforma {
     /** Deja la plataforma vacía; los ids vuelven a empezar en 1. */
     public synchronized void vaciar() {
         red = new RedSocial();
+        versionRed++;
         publicaciones.clear();
         iniciativas.clear();
     }
