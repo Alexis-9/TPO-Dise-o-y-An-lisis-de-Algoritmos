@@ -20,7 +20,6 @@ public class ResultadoBacktracking<T> {
         return !cadenas.isEmpty();
     }
 
-    /** Menor tiempo total; si empatan, la que tiene menos usuarios. Null si no hay cadenas. */
     public CadenaDifusion<T> getMejor() {
         CadenaDifusion<T> mejor = null;
 
