@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** B3: todas las cadenas de difusión que cumplen tiempo máximo, intermediarios y exclusiones. */
 public class BackTracking<T> {
 
     private final Grafo<T> grafo;
