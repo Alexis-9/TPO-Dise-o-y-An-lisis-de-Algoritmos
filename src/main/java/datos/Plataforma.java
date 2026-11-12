@@ -1,15 +1,9 @@
 package datos;
 
-import model.Iniciativa;
-import model.Publicacion;
-import model.RedSocial;
-import model.Usuario;
-import model.Vinculo;
+import model.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Estado en memoria de la aplicación: la red social, las publicaciones y las iniciativas.
@@ -25,6 +19,9 @@ public class Plataforma {
     private RedSocial red = new RedSocial();
     private final List<Publicacion> publicaciones = new ArrayList<>();
     private final List<Iniciativa> iniciativas = new ArrayList<>();
+    private final List<Moderador> moderadores = new ArrayList<>();
+    private final List<Comunidad> comunidades = new ArrayList<>();
+    private final Map<Integer, Map<Integer, Integer>> costos = new HashMap<>();
 
     /**
      * Sube cada vez que cambia la red (usuarios o vínculos). Sirve para saber si un resultado
@@ -163,5 +160,78 @@ public class Plataforma {
         versionRed++;
         publicaciones.clear();
         iniciativas.clear();
+        moderadores.clear();
+    }
+
+    public synchronized Moderador agregarModerador(String nombreModerador, int limiteComunidades) {
+
+        int id = 1;
+        for (Moderador i : moderadores) {
+            id = Math.max(id, i.getId() + 1);
+        }
+
+        Moderador nuevoModerador = new Moderador(id, nombreModerador, limiteComunidades);
+
+        moderadores.add(nuevoModerador);
+        costos.put(id, new HashMap<>());
+
+        return nuevoModerador;
+
+    }
+
+    public synchronized void eliminarModerador(int idModerador) {
+        boolean eliminada = moderadores.removeIf(i -> i.getId() == idModerador);
+        if (!eliminada) { throw new NoSuchElementException("No existe un moderador con id " + idModerador); }
+        else { costos.remove(idModerador); }
+    }
+
+    public synchronized Comunidad agregarComunidad(String nombreComunidad) {
+
+        int id = 1;
+        for (Comunidad i : comunidades) {
+            id = Math.max(id, i.getId() + 1);
+        }
+
+        Comunidad nuevaComunidad = new Comunidad(id, nombreComunidad);
+        comunidades.add(nuevaComunidad);
+
+        return nuevaComunidad;
+
+    }
+
+    public synchronized void eliminarComunidad(int idComunidad) {
+        boolean eliminada = comunidades.removeIf(i -> i.getId() == idComunidad);
+        if (!eliminada) { throw new NoSuchElementException("No existe una comunidad con id " + idComunidad); }
+        else {
+            for (Map<Integer, Integer> modComunidades : costos.values()) {
+
+                modComunidades.remove(idComunidad);
+
+            }
+        }
+    }
+
+    public synchronized void definirCosto(int idModerador, int idComunidad, int costo) {
+        if (!costos.containsKey(idModerador)) {
+            throw new NoSuchElementException("No existe un moderador con id " + idModerador);
+        }
+        if (comunidades.stream().noneMatch(c -> c.getId() == idComunidad)) {
+            throw new NoSuchElementException("No existe una comunidad con id " + idComunidad);
+        }
+        costos.get(idModerador).put(idComunidad, costo);
+    }
+
+    public synchronized List<Moderador> getModeradores() { return new ArrayList<>(moderadores); }
+
+    public synchronized List<Comunidad> getComunidades() { return new ArrayList<>(comunidades); }
+
+    public synchronized Map<Integer, Map<Integer, Integer>> getCostos() {
+        Map<Integer, Map<Integer, Integer>> copiaCostos = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<Integer, Integer>> e : costos.entrySet()) {
+            copiaCostos.put(e.getKey(), new HashMap<>(e.getValue()));
+        }
+
+        return copiaCostos;
     }
 }
