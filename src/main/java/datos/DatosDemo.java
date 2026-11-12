@@ -18,6 +18,11 @@ import java.time.LocalDateTime;
  *
  * Iniciativas (8): con presupuesto 50, elegir por impacto/costo (Greedy) toma #1 (6 por unidad),
  * #2 (5) y #5 (2,67): costo 45, impacto 200. La mochila elige #2 y #3: costo 50, impacto 220.
+ *
+ * Moderación (4 candidatos, 5 comunidades): asignar cada comunidad al más barato con cupo libre
+ * (la cota inicial del Branch and Bound) gasta el cupo de Lucía en Programación y Matemática y
+ * cuesta 34. El óptimo, único, cuesta 31: Lucía -> Programación y Diseño, Sofía -> Matemática,
+ * Mateo -> Física, Tomás -> Economía.
  */
 public class DatosDemo {
 
@@ -28,6 +33,34 @@ public class DatosDemo {
             cargarRed(plataforma);
             cargarPublicaciones(plataforma);
             cargarIniciativas(plataforma);
+            cargarModeracion(plataforma);
+        }
+    }
+
+    private void cargarModeracion(Plataforma plataforma) {
+        plataforma.agregarComunidad("Programación");  // 1
+        plataforma.agregarComunidad("Matemática");    // 2
+        plataforma.agregarComunidad("Diseño");        // 3
+        plataforma.agregarComunidad("Física");        // 4
+        plataforma.agregarComunidad("Economía");      // 5
+
+        plataforma.agregarModerador("Lucía", 2);      // 1
+        plataforma.agregarModerador("Mateo", 2);      // 2
+        plataforma.agregarModerador("Sofía", 1);      // 3
+        plataforma.agregarModerador("Tomás", 2);      // 4
+
+        // Costo de cada moderador (fila) para cada comunidad (columna)
+        int[][] costos = {
+                //  Prog Mat Dis Fís Eco
+                {    4,  5,  6, 14, 12 },   // Lucía
+                {    6,  9, 15,  7, 10 },   // Mateo
+                {   10,  6, 12, 11,  9 },   // Sofía
+                {   12, 11, 10, 13,  8 },   // Tomás
+        };
+        for (int m = 0; m < costos.length; m++) {
+            for (int c = 0; c < costos[m].length; c++) {
+                plataforma.definirCosto(m + 1, c + 1, costos[m][c]);
+            }
         }
     }
 

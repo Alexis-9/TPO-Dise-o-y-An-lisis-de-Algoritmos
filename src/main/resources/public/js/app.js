@@ -3,10 +3,13 @@ import { api } from './api.js';
 import * as difusion from './difusion.js';
 import * as muro from './muro.js';
 import * as iniciativas from './iniciativas.js';
+import * as consultas from './consultas.js';
+import * as alternativas from './alternativas.js';
+import * as moderadores from './moderadores.js';
 
-const vistas = { difusion, muro, iniciativas };
+const vistas = { difusion, muro, iniciativas, consultas, alternativas, moderadores };
 
-const NOMBRES = ['difusion', 'muro', 'iniciativas'];
+const NOMBRES = Object.keys(vistas);
 let vistaActual = null;
 
 function mostrar(nombre, { foco = false } = {}) {
@@ -19,6 +22,8 @@ function mostrar(nombre, { foco = false } = {}) {
     pestana.setAttribute('aria-selected', String(activa));
     pestana.tabIndex = activa ? 0 : -1;
     if (activa && foco) pestana.focus();
+    // En pantallas chicas la barra de pestañas scrollea: la activa tiene que quedar a la vista
+    if (activa) pestana.parentElement.scrollLeft = Math.max(0, pestana.offsetLeft - 24);
   }
   for (const n of NOMBRES) {
     document.getElementById('vista-' + n).hidden = n !== nombre;

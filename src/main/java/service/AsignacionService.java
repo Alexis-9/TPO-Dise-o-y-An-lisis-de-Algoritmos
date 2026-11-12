@@ -26,6 +26,16 @@ public class AsignacionService {
         List<Comunidad> comunidades = plataforma.getComunidades();
         Map<Integer, Map<Integer, Integer>> costos = plataforma.getCostos();
 
+        if (comunidades.isEmpty()) { throw new IllegalArgumentException("No hay comunidades para asignar"); }
+        if (moderadores.isEmpty()) { throw new IllegalArgumentException("No hay moderadores candidatos"); }
+
+        int cupoTotal = 0;
+        for (Moderador m : moderadores) { cupoTotal += m.getLimiteComunidades(); }
+        if (cupoTotal < comunidades.size()) {
+            throw new IllegalArgumentException("Entre todos los moderadores pueden atender " + cupoTotal
+                    + " comunidades y hay " + comunidades.size());
+        }
+
         int[][] costosMatriz = new int[moderadores.size()][comunidades.size()];
         int[] limites = new int[moderadores.size()];
 
@@ -41,7 +51,7 @@ public class AsignacionService {
                 Integer costoMod = costos.get(mod.getId()).get(com.getId());
 
                 if (costoMod == null) {
-                    throw new IllegalStateException("Falta definir el costo del moderador " + mod.getId() + " para la comunidad " + com.getId());
+                    throw new IllegalArgumentException("Falta definir el costo de " + mod.getNombre() + " para " + com.getNombre());
                 }
 
                 costosMatriz[moderador][comunidad] = costoMod;
@@ -80,14 +90,34 @@ public class AsignacionService {
         return new PlanAsignacion(asignaciones, resultado.getCostoMinimo());
     }
 
-    public Moderador agregarModerador(String nombreMod, int limiteCom) { return plataforma.agregarModerador(nombreMod, limiteCom); }
+    /** Moderadores en el orden en que se cargaron (que es el de sus ids). */
+    public List<Moderador> listarModeradores() { return plataforma.getModeradores(); }
+
+    /** Comunidades en el orden en que se cargaron (que es el de sus ids). */
+    public List<Comunidad> listarComunidades() { return plataforma.getComunidades(); }
+
+    /** costos.get(idModerador).get(idComunidad); falta la entrada si todavía no se definió. */
+    public Map<Integer, Map<Integer, Integer>> costos() { return plataforma.getCostos(); }
+
+    public Moderador agregarModerador(String nombreMod, int limiteCom) {
+        // Moderador no valida nada
+        if (nombreMod == null || nombreMod.isBlank()) { throw new IllegalArgumentException("El nombre no puede estar vacío"); }
+        if (limiteCom < 1) { throw new IllegalArgumentException("El límite de comunidades tiene que ser al menos 1"); }
+        return plataforma.agregarModerador(nombreMod.strip(), limiteCom);
+    }
 
     public void eliminarModerador(int idMod) { plataforma.eliminarModerador(idMod); }
 
-    public Comunidad agregarComunidad(String nombreCom) { return plataforma.agregarComunidad(nombreCom); }
+    public Comunidad agregarComunidad(String nombreCom) {
+        if (nombreCom == null || nombreCom.isBlank()) { throw new IllegalArgumentException("El nombre no puede estar vacío"); }
+        return plataforma.agregarComunidad(nombreCom.strip());
+    }
 
     public void eliminarComunidad(int idCom) { plataforma.eliminarComunidad(idCom); }
 
-    public void definirCosto(int idModerador, int idComunidad, int costo) { plataforma.definirCosto(idModerador, idComunidad, costo); }
+    public void definirCosto(int idModerador, int idComunidad, int costo) {
+        if (costo < 0) { throw new IllegalArgumentException("El costo no puede ser negativo"); }
+        plataforma.definirCosto(idModerador, idComunidad, costo);
+    }
 
 }

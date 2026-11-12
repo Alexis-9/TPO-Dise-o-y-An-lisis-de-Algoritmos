@@ -18,6 +18,8 @@ class DatosDemoTest {
         assertEquals(14, plataforma.getVinculos().size());
         assertEquals(12, plataforma.getPublicaciones().size());
         assertEquals(8, plataforma.getIniciativas().size());
+        assertEquals(4, plataforma.getModeradores().size());
+        assertEquals(5, plataforma.getComunidades().size());
         assertEquals("Ana", plataforma.getUsuario(1).getNombre());
         assertEquals("Hugo", plataforma.getUsuario(8).getNombre());
     }

@@ -32,6 +32,8 @@ function acercar(p, hacia, d) {
   return { x: p.x + ((hacia.x - p.x) / largo) * d, y: p.y + ((hacia.y - p.y) / largo) * d };
 }
 
+let instancias = 0;
+
 export class Grafo {
   /**
    * @param svg     elemento <svg> con viewBox 0 0 800 500
@@ -47,14 +49,22 @@ export class Grafo {
     this.previa = null;
     this.animacion = null;
     this.terminarAnimacion = null;
+    // Puede haber varios grafos en la página: los ids de las flechas no se pueden repetir,
+    // porque url(#id) toma el primero del documento aunque esté en una vista oculta
+    this.prefijo = `g${++instancias}-`;
     this.armarBase();
+  }
+
+  /** Referencia a la punta de flecha de este grafo ('flecha' o 'flecha-acento'). */
+  punta(nombre) {
+    return `url(#${this.prefijo}${nombre})`;
   }
 
   armarBase() {
     const defs = crear('defs', {}, this.svg);
-    for (const [id, tamano] of [['flecha', 9], ['flecha-acento', 11]]) {
+    for (const [nombre, tamano] of [['flecha', 9], ['flecha-acento', 11]]) {
       const marcador = crear('marker', {
-        id, class: id, viewBox: '0 0 10 10', refX: 9, refY: 5,
+        id: this.prefijo + nombre, class: nombre, viewBox: '0 0 10 10', refX: 9, refY: 5,
         markerWidth: tamano, markerHeight: tamano, markerUnits: 'userSpaceOnUse', orient: 'auto',
       }, defs);
       crear('path', { d: 'M0,1 L10,5 L0,9 z' }, marcador);
@@ -164,7 +174,7 @@ export class Grafo {
 
   crearArista(origen, destino) {
     const g = crear('g', { class: 'arista' }, this.capaAristas);
-    const linea = crear('path', { class: 'linea', 'marker-end': 'url(#flecha)' }, g);
+    const linea = crear('path', { class: 'linea', 'marker-end': this.punta('flecha') }, g);
     const toque = crear('path', { class: 'toque' }, g);
     const texto = crear('text', { class: 'minutos' }, g);
 
@@ -297,7 +307,7 @@ export class Grafo {
     const clases = this.estilo.arista?.(arista.origen, arista.destino) ?? '';
     arista.g.setAttribute('class', `arista ${clases}`.trim());
     const acento = clases.split(' ').some((c) => ACENTUADAS.has(c)) || arista.linea.classList.contains('mejora');
-    arista.linea.setAttribute('marker-end', acento ? 'url(#flecha-acento)' : 'url(#flecha)');
+    arista.linea.setAttribute('marker-end', this.punta(acento ? 'flecha-acento' : 'flecha'));
   }
 
   /** Resalta un instante las aristas indicadas (por ejemplo, las que mejoraron una distancia). */
@@ -321,7 +331,7 @@ export class Grafo {
 
   /** Flecha punteada de origen a destino mientras se carga un vínculo nuevo. */
   mostrarPrevia(origen, destino) {
-    this.previa = { origen, destino, linea: crear('path', { class: 'previa', 'marker-end': 'url(#flecha-acento)' }) };
+    this.previa = { origen, destino, linea: crear('path', { class: 'previa', 'marker-end': this.punta('flecha-acento') }) };
     this.capaPrevia.replaceChildren(this.previa.linea);
     this.dibujarPrevia();
   }

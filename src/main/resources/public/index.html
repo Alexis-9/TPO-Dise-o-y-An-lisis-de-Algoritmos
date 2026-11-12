@@ -23,6 +23,12 @@
                 aria-controls="vista-muro" aria-selected="false" tabindex="-1">Muro</button>
         <button type="button" class="pestana" role="tab" id="tab-iniciativas" data-vista="iniciativas"
                 aria-controls="vista-iniciativas" aria-selected="false" tabindex="-1">Iniciativas</button>
+        <button type="button" class="pestana" role="tab" id="tab-consultas" data-vista="consultas"
+                aria-controls="vista-consultas" aria-selected="false" tabindex="-1">Consultas</button>
+        <button type="button" class="pestana" role="tab" id="tab-alternativas" data-vista="alternativas"
+                aria-controls="vista-alternativas" aria-selected="false" tabindex="-1">Alternativas</button>
+        <button type="button" class="pestana" role="tab" id="tab-moderadores" data-vista="moderadores"
+                aria-controls="vista-moderadores" aria-selected="false" tabindex="-1">Moderadores</button>
       </nav>
 
       <div class="globales">
@@ -195,6 +201,150 @@
       <div class="tarjetas" id="tarjetas"></div>
       <p class="vacio" id="ini-vacio" hidden>Todavía no hay iniciativas. Agregá una o cargá la demo.</p>
       <p class="error" id="ini-error" role="alert"></p>
+    </section>
+
+    <!-- 4. Consultas entre todos los usuarios (Floyd) ------------------------- -->
+    <section class="vista" id="vista-consultas" role="tabpanel" aria-labelledby="tab-consultas" hidden>
+      <div class="resultado" aria-live="polite">
+        <p class="resultado-ayuda" id="cons-ayuda"></p>
+        <div class="resultado-datos" id="cons-datos" hidden>
+          <p class="cadena" id="cons-cadena"></p>
+          <p class="tiempo" id="cons-tiempo"><span class="tiempo-numero" id="cons-tiempo-numero"></span><span class="tiempo-unidad">min</span></p>
+          <p class="resultado-detalle" id="cons-detalle"></p>
+        </div>
+      </div>
+
+      <div class="consultas">
+        <div class="matriz-bloque">
+          <div class="matriz-barra">
+            <h2 class="titulo-chico">Tiempo mínimo de difusión, en minutos</h2>
+            <p class="criterio" id="cons-estado"></p>
+          </div>
+          <div class="matriz-scroll">
+            <table class="matriz" id="cons-matriz">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="nota">Filas: quién origina. Columnas: a quién le llega. Un guion indica que no existe
+            ninguna cadena de difusión entre ese par. Click en una celda para ver la cadena.</p>
+          <p class="error" id="cons-error" role="alert"></p>
+        </div>
+
+        <div class="lienzo lienzo-chico">
+          <svg class="grafo-svg" id="cons-grafo" viewBox="0 0 800 500" role="img" aria-label="Grafo de la red social"></svg>
+          <p class="vacio lienzo-vacio" id="cons-vacio" hidden>Todavía no hay usuarios. Cargalos en Difusión o cargá la demo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Cadenas alternativas (Backtracking) --------------------------------- -->
+    <section class="vista" id="vista-alternativas" role="tabpanel" aria-labelledby="tab-alternativas" hidden>
+      <div class="difusion">
+        <div class="difusion-principal">
+          <div class="resultado" aria-live="polite">
+            <p class="resultado-ayuda" id="alt-ayuda"></p>
+            <div class="resultado-datos" id="alt-datos" hidden>
+              <p class="cadena" id="alt-cadena"></p>
+              <p class="tiempo" id="alt-tiempo"><span class="tiempo-numero" id="alt-tiempo-numero"></span><span class="tiempo-unidad">min</span></p>
+              <p class="resultado-detalle" id="alt-detalle"></p>
+            </div>
+          </div>
+
+          <div class="lienzo">
+            <svg class="grafo-svg" id="alt-grafo" viewBox="0 0 800 500" role="img" aria-label="Grafo de la red social"></svg>
+            <p class="vacio lienzo-vacio" id="alt-vacio" hidden>Todavía no hay usuarios. Cargalos en Difusión o cargá la demo.</p>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <div class="campos-dos">
+            <label class="campo"><span>Origen</span><select id="alt-origen"></select></label>
+            <label class="campo"><span>Destino</span><select id="alt-destino"></select></label>
+          </div>
+          <div class="campos-dos">
+            <label class="campo"><span>Tiempo máximo (min)</span>
+              <input type="number" id="alt-tiempo-max" min="0" step="1" value="30"></label>
+            <label class="campo"><span>Máx. intermediarios</span>
+              <input type="number" id="alt-intermediarios" min="0" step="1" value="3"></label>
+          </div>
+
+          <fieldset class="excluidos">
+            <legend>Usuarios excluidos</legend>
+            <div class="excluidos-lista" id="alt-excluidos"></div>
+            <p class="nota">También podés excluir o volver a incluir a alguien con un click en el grafo.</p>
+          </fieldset>
+          <p class="error" id="alt-error" role="alert"></p>
+
+          <div class="cadenas" id="alt-resultados" hidden>
+            <div class="pasos-cabecera">
+              <h2 class="titulo-chico" id="alt-titulo-lista"></h2>
+              <span class="pasos-contador">por tiempo</span>
+            </div>
+            <ol class="cadenas-lista" id="alt-lista"></ol>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 6. Asignación de moderadores (Branch and Bound) ------------------------ -->
+    <section class="vista" id="vista-moderadores" role="tabpanel" aria-labelledby="tab-moderadores" hidden>
+      <div class="mod-superior">
+        <form class="form-linea" id="form-moderador">
+          <label class="campo campo-autor"><span>Moderador</span>
+            <input type="text" id="mod-nombre" required maxlength="40" autocomplete="off"></label>
+          <label class="campo campo-num"><span>Límite de comunidades</span>
+            <input type="number" id="mod-limite" min="1" step="1" value="1" required></label>
+          <button type="submit" class="boton">Agregar</button>
+          <p class="error" role="alert"></p>
+        </form>
+
+        <form class="form-linea" id="form-comunidad">
+          <label class="campo campo-autor"><span>Comunidad</span>
+            <input type="text" id="com-nombre" required maxlength="40" autocomplete="off"></label>
+          <button type="submit" class="boton">Agregar</button>
+          <p class="error" role="alert"></p>
+        </form>
+      </div>
+
+      <div class="metricas" aria-live="polite">
+        <div class="metrica"><span class="metrica-valor" id="mod-costo">–</span><span class="metrica-nombre">Costo total mínimo</span></div>
+        <div class="metrica"><span class="metrica-valor" id="mod-cubiertas">–</span><span class="metrica-nombre">Comunidades cubiertas</span></div>
+        <div class="metrica"><span class="metrica-valor" id="mod-cupo">–</span><span class="metrica-nombre">Cupo total de los moderadores</span></div>
+      </div>
+      <p class="error mod-error-plan" id="mod-error-plan" role="alert"></p>
+
+      <div class="matriz-scroll">
+        <table class="matriz matriz-costos" id="mod-matriz">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="nota">Cada celda es el costo de que ese moderador atienda esa comunidad; se puede editar.
+        Las celdas resaltadas son la asignación de menor costo total.</p>
+      <p class="vacio" id="mod-vacio" hidden>Todavía no hay moderadores ni comunidades. Agregalos o cargá la demo.</p>
+      <p class="error" id="mod-error" role="alert"></p>
+
+      <div class="poda">
+        <h2 class="titulo-chico">Cómo descarta alternativas el Branch and Bound</h2>
+        <p>La búsqueda decide las comunidades en orden: cada nivel del árbol es una comunidad y cada rama,
+          el moderador que la atiende. Siempre expande primero la asignación parcial con menor cota.</p>
+        <dl>
+          <dt>Cupo agotado</dt>
+          <dd>Un moderador que ya cubrió su límite no se prueba para la comunidad siguiente: cualquier rama
+            que lo use de nuevo es inválida desde el principio.</dd>
+          <dt>Cota inferior</dt>
+          <dd>Costo acumulado más, por cada comunidad que falta, el menor costo entre los moderadores que
+            todavía tienen cupo. Ninguna forma de completar la asignación puede costar menos que eso.</dd>
+          <dt>Mejor solución conocida</dt>
+          <dd>Antes de buscar se arma una asignación válida eligiendo, comunidad por comunidad, al más barato
+            con cupo. Su costo es el valor a mejorar: una rama cuya cota lo iguala o lo supera se descarta,
+            porque no puede dar una solución mejor.</dd>
+          <dt>Fin de la búsqueda</dt>
+          <dd>Cuando la asignación parcial con menor cota ya no puede mejorar la mejor solución, ninguna otra
+            tampoco: el resto del árbol se descarta entero.</dd>
+        </dl>
+      </div>
     </section>
   </main>
 </body>
