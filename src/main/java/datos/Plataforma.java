@@ -161,6 +161,8 @@ public class Plataforma {
         publicaciones.clear();
         iniciativas.clear();
         moderadores.clear();
+        comunidades.clear();
+        costos.clear();
     }
 
     public synchronized Moderador agregarModerador(String nombreModerador, int limiteComunidades) {
