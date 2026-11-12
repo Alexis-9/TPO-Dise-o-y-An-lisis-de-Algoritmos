@@ -7,6 +7,9 @@ import java.util.PriorityQueue;
 
 public class AsignacionModeradores {
 
+    public static final int INCOMPATIBLE = -1;
+    private static final int SIN_SOLUCION = Integer.MAX_VALUE;
+
     private AsignacionModeradores() { }
 
     static class Estado implements Comparable<Estado> {
@@ -56,13 +59,13 @@ public class AsignacionModeradores {
         }
 
         int[] mejor = solucionGreedy(costo, limites);
-        int costoMinimo = costoDe(costo, mejor);
+        int costoMinimo = (mejor == null) ? SIN_SOLUCION : costoDe(costo, mejor);
 
         Estado raiz = new Estado(cantComunidades, limites);
         raiz.cotaInferior = calcularCotaInferior(costo, raiz.cupo, 0, 0);
 
         PriorityQueue<Estado> vivos = new PriorityQueue<>();
-        vivos.add(raiz);
+        if (raiz.cotaInferior != SIN_SOLUCION) { vivos.add(raiz); }
 
         while (!vivos.isEmpty()) {
             Estado actual = vivos.poll();
@@ -79,7 +82,7 @@ public class AsignacionModeradores {
 
             int c = actual.nivel;
             for (int m = 0; m < cantModeradores; m++) {
-                if (actual.cupo[m] == 0) {
+                if (actual.cupo[m] == 0 || costo[m][c] == INCOMPATIBLE) {
                     continue;
                 }
 
@@ -103,10 +106,12 @@ public class AsignacionModeradores {
         int cota = costoAcumulado;
 
         for (int c = nivel; c < costo[0].length; c++) {
-            int minimo = Integer.MAX_VALUE;
+            int minimo = SIN_SOLUCION;
             for (int m = 0; m < costo.length; m++) {
-                if (cupo[m] > 0 && costo[m][c] < minimo) { minimo = costo[m][c]; }
+                if (cupo[m] > 0 && costo[m][c] != INCOMPATIBLE && costo[m][c] < minimo) { minimo = costo[m][c]; }
             }
+
+            if (minimo == SIN_SOLUCION) { return SIN_SOLUCION; }
             cota += minimo;
         }
         return cota;
@@ -120,11 +125,13 @@ public class AsignacionModeradores {
             int elegido = -1;
 
             for (int m = 0; m < costo.length; m++) {
-                if (cupo[m] > 0 && (elegido == -1 || costo[m][c] < costo[elegido][c])) {
+                if (cupo[m] > 0  && costo[m][c] != INCOMPATIBLE && (elegido == -1 || costo[m][c] < costo[elegido][c])) {
                     elegido = m;
                 }
 
             }
+
+            if (elegido == -1) { return null; }
 
             moderadorDe[c] = elegido;
             cupo[elegido]--;

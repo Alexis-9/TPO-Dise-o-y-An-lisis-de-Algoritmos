@@ -120,4 +120,8 @@ public class AsignacionService {
         plataforma.definirCosto(idModerador, idComunidad, costo);
     }
 
+    public void definirIncompatible(int idModerador, int idComunidad) {
+        plataforma.definirCosto(idModerador, idComunidad, AsignacionModeradores.INCOMPATIBLE);
+    }
+
 }
