@@ -33,11 +33,17 @@ Con un presupuesto limitado, elige el conjunto de iniciativas de mayor impacto t
 
 ---
 
-## Segunda etapa (a confirmar)
+## Segunda etapa
 
-- **A1** — Consultas de difusión entre todos los usuarios
-- **B3** — Cadenas alternativas de difusión
-- **B4** — Asignación de moderadores
+| # | Funcionalidad | Estrategia | Algoritmo | Pestaña web | Consola |
+|---|---|---|---|---|---|
+| A1 | Consultas de difusión entre todos los usuarios | Programación Dinámica | Floyd | Consultas | 7 y 8 |
+| B3 | Cadenas alternativas de difusión | Backtracking | Búsqueda de todas las cadenas con podas | Alternativas | 9 |
+| B4 | Asignación de moderadores | Branch and Bound | Cota inferior + mejor solución conocida | Moderadores | 10 |
+
+- **Consultas**: Floyd corre una vez sobre la red y el resultado queda guardado; la tabla de todos los pares y cada consulta salen de esas matrices. Solo se recalcula si cambió la red.
+- **Alternativas**: con origen, destino, tiempo máximo, límite de intermediarios y usuarios excluidos (se marcan en el panel o con un click en el grafo), lista todas las cadenas válidas y resalta la de menor tiempo.
+- **Moderadores**: tabla de costos editable; resalta la asignación de menor costo total y explica los criterios de poda.
 
 ---
 
@@ -96,5 +102,8 @@ Los tests JUnit cubren los services de las tres funcionalidades:
 - `MuroServiceTest` — orden por fecha y por relevancia, desempates
 - `DifusionServiceTest` — cadena mínima, destino inalcanzable, traza de decisiones
 - `IniciativasServiceTest` — selección óptima, presupuesto insuficiente, caso Greedy vs. PD
+- `ConsultasDifusionServiceTest` — consultas entre pares con Floyd, pares sin cadena, recálculo al cambiar la red
+- `CadenasAlternativasServiceTest` — todas las cadenas dentro del tiempo, límite de intermediarios, excluidos
+- `AsignacionServiceTest` — óptimo que mejora la solución greedy inicial, cupo insuficiente, costos faltantes
 
 ---

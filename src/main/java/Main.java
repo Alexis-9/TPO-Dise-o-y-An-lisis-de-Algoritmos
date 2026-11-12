@@ -1,16 +1,20 @@
-package main.java;
-
 import datos.DatosDemo;
 import datos.Plataforma;
+import service.AsignacionService;
+import service.CadenasAlternativasService;
+import service.ConsultasDifusionService;
 import service.DatosService;
 import service.DifusionService;
 import service.IniciativasService;
 import service.MuroService;
 import service.RedService;
 import web.ApiServer;
+import web.controller.CadenasController;
+import web.controller.ConsultasController;
 import web.controller.DatosController;
 import web.controller.DifusionController;
 import web.controller.IniciativasController;
+import web.controller.ModeracionController;
 import web.controller.MuroController;
 import web.controller.RedController;
 
@@ -39,6 +43,9 @@ public class Main {
         DifusionService difusionService = new DifusionService(plataforma);
         MuroService muroService = new MuroService(plataforma);
         IniciativasService iniciativasService = new IniciativasService(plataforma);
+        ConsultasDifusionService consultasService = new ConsultasDifusionService(plataforma);
+        CadenasAlternativasService cadenasService = new CadenasAlternativasService(plataforma);
+        AsignacionService asignacionService = new AsignacionService(plataforma);
         DatosService datosService = new DatosService(plataforma, datosDemo);
 
         // Al arrancar, la aplicación muestra la demo
@@ -49,6 +56,9 @@ public class Main {
                 new DifusionController(difusionService),
                 new MuroController(muroService),
                 new IniciativasController(iniciativasService),
+                new ConsultasController(consultasService),
+                new CadenasController(cadenasService),
+                new ModeracionController(asignacionService),
                 new DatosController(datosService));
         servidor.iniciar(puerto);
 

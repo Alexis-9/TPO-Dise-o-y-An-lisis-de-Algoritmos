@@ -39,6 +39,13 @@ export const api = {
   publicaciones: (orden) => pedir('GET', `/publicaciones?orden=${q(orden)}`),
   iniciativas: () => pedir('GET', '/iniciativas'),
   seleccion: (presupuesto) => pedir('GET', `/iniciativas/seleccion?presupuesto=${q(presupuesto)}`),
+  tablaConsultas: () => pedir('GET', '/consultas/tabla'),
+  consulta: (origen, destino) => pedir('GET', `/consultas?origen=${q(origen)}&destino=${q(destino)}`),
+  cadenas: ({ origen, destino, tiempoMax, intermediarios, excluidos }) => pedir('GET',
+    `/cadenas?origen=${q(origen ?? '')}&destino=${q(destino ?? '')}&tiempoMax=${q(tiempoMax ?? '')}`
+    + `&intermediarios=${q(intermediarios ?? '')}&excluidos=${q(excluidos.join(','))}`),
+  moderacion: () => pedir('GET', '/moderacion'),
+  asignacion: () => pedir('GET', '/moderacion/asignacion'),
 
   // Carga
   crearUsuario: (nombre) => pedir('POST', '/usuarios', { nombre }),
@@ -49,6 +56,11 @@ export const api = {
   eliminarPublicacion: (id) => pedir('DELETE', `/publicaciones/${q(id)}`),
   crearIniciativa: (costo, impacto) => pedir('POST', '/iniciativas', { costo, impacto }),
   eliminarIniciativa: (id) => pedir('DELETE', `/iniciativas/${q(id)}`),
+  crearModerador: (nombre, limite) => pedir('POST', '/moderadores', { nombre, limite }),
+  eliminarModerador: (id) => pedir('DELETE', `/moderadores/${q(id)}`),
+  crearComunidad: (nombre) => pedir('POST', '/comunidades', { nombre }),
+  eliminarComunidad: (id) => pedir('DELETE', `/comunidades/${q(id)}`),
+  definirCosto: (moderador, comunidad, costo) => pedir('PUT', '/costos', { moderador, comunidad, costo }),
 
   // Todo junto
   cargarDemo: () => pedir('POST', '/datos/demo'),

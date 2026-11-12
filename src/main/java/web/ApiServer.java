@@ -8,9 +8,12 @@ import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.controller.CadenasController;
+import web.controller.ConsultasController;
 import web.controller.DatosController;
 import web.controller.DifusionController;
 import web.controller.IniciativasController;
+import web.controller.ModeracionController;
 import web.controller.MuroController;
 import web.controller.RedController;
 import web.dto.ErrorDto;
@@ -28,7 +31,8 @@ public class ApiServer {
     private final Javalin app;
 
     public ApiServer(RedController red, DifusionController difusion, MuroController muro,
-                     IniciativasController iniciativas, DatosController datos) {
+                     IniciativasController iniciativas, ConsultasController consultas,
+                     CadenasController cadenas, ModeracionController moderacion, DatosController datos) {
         app = Javalin.create(config -> {
             config.startup.showJavalinBanner = false;
             config.staticFiles.add("/public", Location.CLASSPATH);
@@ -39,6 +43,11 @@ public class ApiServer {
             config.routes.get("/api/publicaciones", muro::listar);
             config.routes.get("/api/iniciativas", iniciativas::listar);
             config.routes.get("/api/iniciativas/seleccion", iniciativas::seleccion);
+            config.routes.get("/api/consultas", consultas::consultar);
+            config.routes.get("/api/consultas/tabla", consultas::tabla);
+            config.routes.get("/api/cadenas", cadenas::calcular);
+            config.routes.get("/api/moderacion", moderacion::datos);
+            config.routes.get("/api/moderacion/asignacion", moderacion::asignacion);
 
             // Carga
             config.routes.post("/api/usuarios", red::crearUsuario);
@@ -49,6 +58,11 @@ public class ApiServer {
             config.routes.delete("/api/publicaciones/{id}", muro::eliminar);
             config.routes.post("/api/iniciativas", iniciativas::crear);
             config.routes.delete("/api/iniciativas/{id}", iniciativas::eliminar);
+            config.routes.post("/api/moderadores", moderacion::crearModerador);
+            config.routes.delete("/api/moderadores/{id}", moderacion::eliminarModerador);
+            config.routes.post("/api/comunidades", moderacion::crearComunidad);
+            config.routes.delete("/api/comunidades/{id}", moderacion::eliminarComunidad);
+            config.routes.put("/api/costos", moderacion::definirCosto);
             config.routes.post("/api/datos/demo", datos::cargarDemo);
             config.routes.post("/api/datos/vaciar", datos::vaciar);
 
