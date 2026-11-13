@@ -1,5 +1,6 @@
 package web.dto;
 
+import algoritmos.AsignacionModeradores;
 import model.Comunidad;
 import model.Moderador;
 
@@ -21,7 +22,12 @@ public record ModeracionDto(List<ModeradorDto> moderadores, List<ComunidadDto> c
             Map<Integer, Integer> deModerador = costos.getOrDefault(m.getId(), Map.of());
             for (Comunidad c : comunidades) {
                 Integer costo = deModerador.get(c.getId());
-                if (costo != null) { listaCostos.add(new CostoDto(m.getId(), c.getId(), costo)); }
+                if (costo == null) { continue; }
+                if (costo == AsignacionModeradores.INCOMPATIBLE) {
+                    listaCostos.add(new CostoDto(m.getId(), c.getId(), null, true));
+                } else {
+                    listaCostos.add(new CostoDto(m.getId(), c.getId(), costo, false));
+                }
             }
         }
         return new ModeracionDto(

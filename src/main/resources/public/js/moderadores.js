@@ -4,6 +4,8 @@ import { api, numero } from './api.js';
 
 let datos = { moderadores: [], comunidades: [], costos: [] };  // respuesta de /api/moderacion
 let plan = null;        // respuesta de /api/moderacion/asignacion, o null si no hay solución
+const INCOMPATIBLE = 'incompatible';
+let costos = new Map(); // `${moderador}>${comunidad}` -> costo o INCOMPATIBLE; falta si no se definió
 let pedido = 0;
 let el;
 
@@ -74,18 +76,50 @@ async function eliminar(accion) {
   await refrescar();
 }
 
-async function cambiarCosto(input, moderador, comunidad) {
+async function cambiarCosto(input, td, m, c) {
   el.error.textContent = '';
+  const clave = `${m.id}>${c.id}`;
   try {
-    await api.definirCosto(moderador, comunidad, numero(input));
+    await api.definirCosto(m.id, c.id, numero(input));
   } catch (e) {
     el.error.textContent = e.message;
-    input.value = input.dataset.valor;   // vuelve al último costo válido
+    if (costos.get(clave) === INCOMPATIBLE) {
+      armarCelda(td, m, c);              // sigue siendo incompatible
+    } else {
+      input.value = input.dataset.valor; // vuelve al último costo válido
+    }
     return;
   }
+  costos.set(clave, Number(input.value));
   input.dataset.valor = input.value;
   input.classList.remove('falta');
+  if (!td.querySelector('.vetar')) armarCelda(td, m, c);   // venía de incompatible: vuelve el ⊘
   await calcular();
+}
+
+async function marcarIncompatible(td, m, c) {
+  el.error.textContent = '';
+  try {
+    await api.definirIncompatible(m.id, c.id);
+  } catch (e) {
+    el.error.textContent = e.message;
+    return;
+  }
+  costos.set(`${m.id}>${c.id}`, INCOMPATIBLE);
+  armarCelda(td, m, c);
+  td.querySelector('button').focus();
+  await calcular();
+}
+
+/** Una celda incompatible pasa a input vacío; si se deja sin costo, vuelve a ser incompatible. */
+function editarIncompatible(td, m, c) {
+  const input = crearInput(td, m, c, null);
+  input.classList.remove('falta');
+  input.addEventListener('blur', () => {
+    if (input.value.trim() === '' && costos.get(`${m.id}>${c.id}`) === INCOMPATIBLE) armarCelda(td, m, c);
+  });
+  td.replaceChildren(input);
+  input.focus();
 }
 
 async function calcular() {
@@ -123,12 +157,13 @@ function botonQuitar(etiqueta, accion) {
 }
 
 function dibujarMatriz() {
-  const { moderadores, comunidades, costos } = datos;
+  const { moderadores, comunidades } = datos;
   const hayAlgo = moderadores.length > 0 || comunidades.length > 0;
   el.vacio.hidden = hayAlgo;
   el.matriz.hidden = !hayAlgo;
 
-  const costo = new Map(costos.map((c) => [`${c.moderador}>${c.comunidad}`, c.costo]));
+  costos = new Map(datos.costos.map((c) =>
+    [`${c.moderador}>${c.comunidad}`, c.incompatible ? INCOMPATIBLE : c.costo]));
 
   const cabecera = document.createElement('tr');
   const esquina = document.createElement('th');
@@ -177,17 +212,7 @@ function dibujarMatriz() {
     for (const c of comunidades) {
       const td = document.createElement('td');
       td.dataset.comunidad = String(c.id);
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = '0';
-      input.step = '1';
-      const valor = costo.get(`${m.id}>${c.id}`);
-      input.value = valor == null ? '' : String(valor);
-      input.dataset.valor = input.value;
-      input.classList.toggle('falta', valor == null);
-      input.setAttribute('aria-label', `Costo de ${m.nombre} para ${c.nombre}`);
-      input.addEventListener('change', () => cambiarCosto(input, m.id, c.id));
-      td.appendChild(input);
+      armarCelda(td, m, c);
       fila.appendChild(td);
     }
 
@@ -198,6 +223,47 @@ function dibujarMatriz() {
     fila.append(asignadas, costoFila);
     return fila;
   }));
+}
+
+function crearInput(td, m, c, valor) {
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.step = '1';
+  input.value = valor == null ? '' : String(valor);
+  input.dataset.valor = input.value;
+  input.classList.toggle('falta', valor == null);
+  input.setAttribute('aria-label', `Costo de ${m.nombre} para ${c.nombre}`);
+  input.addEventListener('change', () => cambiarCosto(input, td, m, c));
+  return input;
+}
+
+/** Contenido de la celda moderador × comunidad: el costo editable, o la marca de incompatible. */
+function armarCelda(td, m, c) {
+  const valor = costos.get(`${m.id}>${c.id}`);
+  const incompatible = valor === INCOMPATIBLE;
+  td.classList.toggle('incompatible', incompatible);
+
+  if (incompatible) {
+    const marca = document.createElement('button');
+    marca.type = 'button';
+    marca.className = 'marca-incompatible';
+    marca.textContent = 'no puede';
+    marca.title = 'Incompatible: el algoritmo nunca le asigna esta comunidad. Click para ponerle un costo';
+    marca.setAttribute('aria-label', `${m.nombre} no puede atender ${c.nombre}. Asignarle un costo`);
+    marca.addEventListener('click', () => editarIncompatible(td, m, c));
+    td.replaceChildren(marca);
+    return;
+  }
+
+  const vetar = document.createElement('button');
+  vetar.type = 'button';
+  vetar.className = 'vetar';
+  vetar.textContent = '⊘';
+  vetar.title = 'Marcar como incompatible';
+  vetar.setAttribute('aria-label', `Marcar que ${m.nombre} no puede atender ${c.nombre}`);
+  vetar.addEventListener('click', () => marcarIncompatible(td, m, c));
+  td.replaceChildren(crearInput(td, m, c, valor), vetar);
 }
 
 function pintarPlan() {

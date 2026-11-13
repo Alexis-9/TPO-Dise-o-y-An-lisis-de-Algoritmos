@@ -1,5 +1,6 @@
 package view;
 
+import algoritmos.AsignacionModeradores;
 import algoritmos.resultado.CadenaDifusion;
 import algoritmos.resultado.ResultadoBacktracking;
 import datos.DatosDemo;
@@ -340,7 +341,9 @@ public class MenuConsola {
             System.out.printf("%-16s", recortar(m.getNombre(), 11) + " (" + m.getLimiteComunidades() + ")");
             for (Comunidad c : comunidades) {
                 Integer costo = costos.getOrDefault(m.getId(), Map.of()).get(c.getId());
-                System.out.printf("%13s", costo == null ? "?" : costo);
+                String celda = costo == null ? "?"
+                        : costo == AsignacionModeradores.INCOMPATIBLE ? "no" : String.valueOf(costo);
+                System.out.printf("%13s", celda);
             }
             System.out.println();
         }
@@ -363,6 +366,7 @@ public class MenuConsola {
         System.out.println();
         System.out.println("Criterios de poda del Branch and Bound:");
         System.out.println(" - No se prueba un moderador que ya cubrió su límite de comunidades.");
+        System.out.println(" - No se prueba un moderador para una comunidad con la que es incompatible (\"no\").");
         System.out.println(" - Cota inferior = costo acumulado + el menor costo de cada comunidad que falta,");
         System.out.println("   entre los moderadores que todavía tienen cupo.");
         System.out.println(" - Se descarta toda rama cuya cota iguale o supere la mejor solución conocida");

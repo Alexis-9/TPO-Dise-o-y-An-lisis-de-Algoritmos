@@ -694,6 +694,47 @@ input:focus, select:focus { outline: 2px solid var(--acento); outline-offset: -1
 .matriz-costos td input.falta { border: 1px dashed var(--error); }
 .matriz-costos td.asignada input { background: var(--acento); color: var(--acento-texto); font-weight: 600; }
 .matriz-costos td.asignada input:focus { background: var(--superficie); color: var(--texto); }
+/* Incompatibilidades: ⊘ aparece al pasar por la celda; la celda marcada queda rayada */
+.matriz-costos td[data-comunidad] { position: relative; }
+.matriz-costos td input { -moz-appearance: textfield; appearance: textfield; }
+.matriz-costos td input::-webkit-inner-spin-button,
+.matriz-costos td input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.matriz-costos .vetar {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--texto-3);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity .15s;
+}
+.matriz-costos td:hover .vetar, .matriz-costos .vetar:focus-visible { opacity: 1; }
+.matriz-costos .vetar:hover { background: var(--hover); color: var(--error); }
+.matriz-costos td.asignada .vetar { color: var(--acento-texto); }
+.matriz-costos td.asignada .vetar:hover { background: transparent; }
+@media (hover: none) { .matriz-costos .vetar { opacity: .6; } }
+.matriz-costos .marca-incompatible {
+  width: 72px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--linea) 5px 6px);
+  font-size: 12px;
+  color: var(--texto-3);
+  cursor: pointer;
+}
+.matriz-costos .marca-incompatible:hover { border-color: var(--linea-fuerte); color: var(--texto-2); }
+
 .matriz-costos .resumen { padding: 0 8px; font-size: 13.5px; color: var(--texto-2); }
 .matriz-costos .costo-fila { font-weight: 600; color: var(--texto); }
 .matriz-costos tr.sin-asignar .mod-nombre, .matriz-costos tr.sin-asignar .resumen { color: var(--texto-3); }

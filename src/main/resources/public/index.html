@@ -321,6 +321,7 @@
         </table>
       </div>
       <p class="nota">Cada celda es el costo de que ese moderador atienda esa comunidad; se puede editar.
+        Con ⊘ se marca que no puede atenderla (incompatible) y se deshace poniéndole un costo.
         Las celdas resaltadas son la asignación de menor costo total.</p>
       <p class="vacio" id="mod-vacio" hidden>Todavía no hay moderadores ni comunidades. Agregalos o cargá la demo.</p>
       <p class="error" id="mod-error" role="alert"></p>
@@ -333,6 +334,10 @@
           <dt>Cupo agotado</dt>
           <dd>Un moderador que ya cubrió su límite no se prueba para la comunidad siguiente: cualquier rama
             que lo use de nuevo es inválida desde el principio.</dd>
+          <dt>Incompatibilidad</dt>
+          <dd>Un moderador marcado como incompatible con una comunidad nunca se prueba para ella, y tampoco
+            cuenta como el más barato al calcular la cota. Si una rama deja alguna comunidad sin nadie
+            compatible con cupo, se descarta entera.</dd>
           <dt>Cota inferior</dt>
           <dd>Costo acumulado más, por cada comunidad que falta, el menor costo entre los moderadores que
             todavía tienen cupo. Ninguna forma de completar la asignación puede costar menos que eso.</dd>
