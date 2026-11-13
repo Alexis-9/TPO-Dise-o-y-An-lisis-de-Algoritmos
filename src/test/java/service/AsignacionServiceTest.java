@@ -1,5 +1,6 @@
 package service;
 
+import algoritmos.AsignacionModeradores;
 import datos.DatosDemo;
 import datos.Plataforma;
 import model.Asignacion;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -79,6 +81,63 @@ class AsignacionServiceTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, service::asignarModeradores);
         assertTrue(e.getMessage().contains("Química"));
+    }
+
+    @Test
+    void unaIncompatibilidadCambiaElOptimo() {
+        // Lucía (1) no puede con Programación (1): el óptimo pasa a 32 y Programación la toma Mateo
+        service.definirIncompatible(1, 1);
+
+        PlanAsignacion plan = service.asignarModeradores();
+
+        assertEquals(32, plan.getCostoTotal());
+        Map<String, List<String>> asignadas = porModerador(plan);
+        assertEquals(List.of("Matemática", "Diseño"), asignadas.get("Lucía"));
+        assertEquals(List.of("Programación", "Física"), asignadas.get("Mateo"));
+        assertEquals(List.of(), asignadas.get("Sofía"));
+        assertEquals(List.of("Economía"), asignadas.get("Tomás"));
+    }
+
+    @Test
+    void laIncompatibilidadQuedaGuardadaEnLosCostos() {
+        service.definirIncompatible(2, 4);
+
+        assertEquals(AsignacionModeradores.INCOMPATIBLE, service.costos().get(2).get(4));
+    }
+
+    @Test
+    void definirUnCostoDeshaceLaIncompatibilidad() {
+        service.definirIncompatible(1, 1);
+        service.definirCosto(1, 1, 4);
+
+        assertEquals(4, service.costos().get(1).get(1));
+        assertEquals(31, service.asignarModeradores().getCostoTotal());
+    }
+
+    @Test
+    void avisaSiUnaComunidadNoTieneModeradorCompatible() {
+        for (int moderador = 1; moderador <= 4; moderador++) { service.definirIncompatible(moderador, 3); }
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, service::asignarModeradores);
+        assertTrue(e.getMessage().contains("Diseño"));
+    }
+
+    @Test
+    void avisaSiLasIncompatibilidadesImpidenCubrirTodo() {
+        // Programación y Matemática quedan solo para Sofía, que atiende una sola comunidad
+        for (int moderador : new int[] { 1, 2, 4 }) {
+            service.definirIncompatible(moderador, 1);
+            service.definirIncompatible(moderador, 2);
+        }
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, service::asignarModeradores);
+        assertTrue(e.getMessage().contains("incompatibilidades"));
+    }
+
+    @Test
+    void incompatibleConIdsQueNoExisten() {
+        assertThrows(NoSuchElementException.class, () -> service.definirIncompatible(99, 1));
+        assertThrows(NoSuchElementException.class, () -> service.definirIncompatible(1, 99));
     }
 
     @Test

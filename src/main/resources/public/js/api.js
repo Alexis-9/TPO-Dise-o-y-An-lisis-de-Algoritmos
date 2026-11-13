@@ -61,6 +61,7 @@ export const api = {
   crearComunidad: (nombre) => pedir('POST', '/comunidades', { nombre }),
   eliminarComunidad: (id) => pedir('DELETE', `/comunidades/${q(id)}`),
   definirCosto: (moderador, comunidad, costo) => pedir('PUT', '/costos', { moderador, comunidad, costo }),
+  definirIncompatible: (moderador, comunidad) => pedir('PUT', '/costos', { moderador, comunidad, incompatible: true }),
 
   // Todo junto
   cargarDemo: () => pedir('POST', '/datos/demo'),

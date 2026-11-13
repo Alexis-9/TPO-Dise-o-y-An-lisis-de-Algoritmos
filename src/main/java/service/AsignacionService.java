@@ -59,8 +59,21 @@ public class AsignacionService {
             }
         }
 
+        for (int comunidad = 0; comunidad < comunidades.size(); comunidad++) {
+            boolean hayCompatible = false;
+            for (int moderador = 0; moderador < moderadores.size() && !hayCompatible; moderador++) {
+                hayCompatible = costosMatriz[moderador][comunidad] != AsignacionModeradores.INCOMPATIBLE;
+            }
+            if (!hayCompatible) {
+                throw new IllegalArgumentException("Ningún moderador puede atender " + comunidades.get(comunidad).getNombre());
+            }
+        }
+
         ResultadoAsignacion resultado = AsignacionModeradores.resolver(costosMatriz, limites);
-        if (!resultado.haySolucion()) { throw new IllegalArgumentException("No se pudieron realizar las asignaciones con los datos recibidos."); }
+        if (!resultado.haySolucion()) {
+            throw new IllegalArgumentException("No hay forma de cubrir todas las comunidades respetando los límites"
+                    + " y las incompatibilidades de los moderadores");
+        }
 
         return generarPlanAsignacion(resultado, moderadores, comunidades, costosMatriz);
 

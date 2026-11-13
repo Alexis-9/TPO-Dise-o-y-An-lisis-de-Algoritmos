@@ -55,14 +55,18 @@ public class ModeracionController {
         ctx.status(204);
     }
 
-    /** PUT /api/costos  con cuerpo { moderador, comunidad, costo } */
+    /** PUT /api/costos  con cuerpo { moderador, comunidad, costo } o { moderador, comunidad, incompatible: true } */
     public void definirCosto(Context ctx) {
         CostoDto pedido = ctx.bodyAsClass(CostoDto.class);
         if (pedido.moderador() == null || pedido.comunidad() == null) {
             throw new IllegalArgumentException("Faltan el moderador o la comunidad");
         }
-        if (pedido.costo() == null) { throw new IllegalArgumentException("Falta el costo"); }
-        service.definirCosto(pedido.moderador(), pedido.comunidad(), pedido.costo());
+        if (Boolean.TRUE.equals(pedido.incompatible())) {
+            service.definirIncompatible(pedido.moderador(), pedido.comunidad());
+        } else {
+            if (pedido.costo() == null) { throw new IllegalArgumentException("Falta el costo"); }
+            service.definirCosto(pedido.moderador(), pedido.comunidad(), pedido.costo());
+        }
         ctx.status(204);
     }
 }
